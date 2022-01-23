@@ -272,13 +272,9 @@ input[type=button]:active, input[type=submit]:active, input[type=reset]:active  
 <div class="wrapper fadeInDown">
   <div id="formContent">
     <!-- Tabs Titles -->
-    <a href="/login" class="login">Login</a>
-    <a href="#" class="login">Sign Up</a>
+
 
     <!-- Icon -->
-    <div class="fadeIn first">
-      <img src="http://danielzawadzki.com/codepen/01/icon.svg" id="icon" alt="User Icon" />
-    </div>
 
     <!-- Login Form -->
 {% from "includes/_formHelper.html" import render_field %}
@@ -288,6 +284,15 @@ input[type=button]:active, input[type=submit]:active, input[type=reset]:active  
   </div>
   <div class="form-group">
     {{ render_field(form.email, class="form-control") }}
+  </div>
+  <div class="form-group">
+    {{ render_field(form.gender, class="form-control") }}
+  </div>
+  <div class="form-group">
+    {{ render_field(form.phone, class="form-control") }}
+  </div>
+  <div class="form-group">
+    {{ render_field(form.birthdate, class="form-control") }}
   </div>
   <div class="form-group">
     {{ render_field(form.password, class="form-control") }}

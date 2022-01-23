@@ -30,9 +30,15 @@ app.static_folder = 'static'
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
+    return render_template('home.html')
+@app.route('/main', methods=['GET', 'POST'])
+def main():
     return render_template('main.html')
+@app.route('/dashboard', methods=['GET', 'POST'])
+def dashboard():
+    return render_template('dashboard.html')
 
-
+#Joshua
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     login_form = LoginForm(request.form)
@@ -75,12 +81,27 @@ def signup():
             customers_dict = db['Customers']
         except:
             print("Error in retrieving Customers from customer.db.")
-        user = shelve.open('signup.db', 'r')
-        users_dict = user['Customers']
-        users_keys = list(users_dict.keys())
-        if create_customer_form.email.data in users_keys:
-            flash(u'User exists')
-        else:
+        try:
+            user = shelve.open('signup.db', 'r')
+            users_dict = user['Customers']
+            users_keys = list(users_dict.keys())
+            if create_customer_form.email.data in users_keys:
+                flash(u'User exists')
+            else:
+                customer = Customer.Customer(
+                    create_customer_form.name.data,
+                    create_customer_form.gender.data,
+                    create_customer_form.phone.data,
+                    create_customer_form.birthdate.data,
+                    create_customer_form.email.data,
+                    create_customer_form.password.data
+                )
+                customers_dict[customer.get_email()] = customer
+                db['Customers'] = customers_dict
+                db.close()
+                return redirect(url_for('login'))
+
+        except:
             customer = Customer.Customer(
                 create_customer_form.name.data,
                 create_customer_form.gender.data,
@@ -93,7 +114,9 @@ def signup():
             db['Customers'] = customers_dict
             db.close()
             return redirect(url_for('login'))
-    return render_template('signup.html', form=create_customer_form)
+
+
+    return render_template('signup.html' , form=create_customer_form)
 
 
 @app.route('/createAdmin', methods=['GET', 'POST'])
@@ -108,17 +131,39 @@ def create_admin():
         except:
             print("Error in retrieving Customers from customer.db.")
 
-        customer = Admin.Customer(
-            create_customer_form.name.data,
-            create_customer_form.email.data,
-            create_customer_form.password.data
-        )
-        customers_dict[customer.get_email()] = customer
-        db['Customers'] = customers_dict
+        try:
+            user = shelve.open('signup.db', 'r')
+            users_dict = user['Customers']
+            users_keys = list(users_dict.keys())
+            if create_customer_form.email.data in users_keys:
+                flash(u'User exists')
+            else:
+                customer = Admin.Customer(
+                    create_customer_form.name.data,
+                    create_customer_form.gender.data,
+                    create_customer_form.phone.data,
+                    create_customer_form.birthdate.data,
+                    create_customer_form.email.data,
+                    create_customer_form.password.data
+                )
+                customers_dict[customer.get_email()] = customer
+                db['Customers'] = customers_dict
+                db.close()
+                return redirect(url_for('manage_admin'))
 
-        db.close()
-
-        return redirect(url_for('manage_admin'))
+        except:
+            customer = Admin.Customer(
+                create_customer_form.name.data,
+                create_customer_form.gender.data,
+                create_customer_form.phone.data,
+                create_customer_form.birthdate.data,
+                create_customer_form.email.data,
+                create_customer_form.password.data
+            )
+            customers_dict[customer.get_email()] = customer
+            db['Customers'] = customers_dict
+            db.close()
+            return redirect(url_for('manage_admin'))
     return render_template('createAdmin.html', form=create_customer_form)
 
 
@@ -320,7 +365,7 @@ def change_password(id):
         db.close()
 
         return redirect(url_for('login'))
-    return render_template('changePassword.html', form=update_customer_form)
+    return render_template('customerChangePass.html', form=update_customer_form)
 
 
 @app.route('/manageAccount/<id>/', methods=['GET', 'POST'])
@@ -570,7 +615,7 @@ def no_customer():
 @app.route('/showCustomer')
 def show_customer():
     return render_template('showCustomer.html')
-
+#Joshua
 
 # APP ROUTES FOR LOAN CREATE/RETRIEVE/UPDATE/DELETE
 @app.route('/Loan.html')
@@ -668,3 +713,4 @@ def delete_loan(id):
 
 if __name__ == '__main__':
     app.run()
+    FLASK_DEBUG=True
