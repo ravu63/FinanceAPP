@@ -6,7 +6,7 @@ import random
 from datetime import date
 from flask_mail import Mail, Message
 from threading import Thread
-home
+home123
 app = Flask(__name__)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
