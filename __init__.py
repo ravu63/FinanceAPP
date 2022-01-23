@@ -70,12 +70,27 @@ def signup():
             customers_dict = db['Customers']
         except:
             print("Error in retrieving Customers from customer.db.")
-        user = shelve.open('signup.db', 'r')
-        users_dict = user['Customers']
-        users_keys = list(users_dict.keys())
-        if create_customer_form.email.data in users_keys:
-            flash(u'User exists')
-        else:
+        try:
+            user = shelve.open('signup.db', 'r')
+            users_dict = user['Customers']
+            users_keys = list(users_dict.keys())
+            if create_customer_form.email.data in users_keys:
+                flash(u'User exists')
+            else:
+                customer = Customer.Customer(
+                    create_customer_form.name.data,
+                    create_customer_form.gender.data,
+                    create_customer_form.phone.data,
+                    create_customer_form.birthdate.data,
+                    create_customer_form.email.data,
+                    create_customer_form.password.data
+                )
+                customers_dict[customer.get_email()] = customer
+                db['Customers'] = customers_dict
+                db.close()
+                return redirect(url_for('login'))
+
+        except:
             customer = Customer.Customer(
                 create_customer_form.name.data,
                 create_customer_form.gender.data,
@@ -88,7 +103,9 @@ def signup():
             db['Customers'] = customers_dict
             db.close()
             return redirect(url_for('login'))
-    return render_template('signup.html', form=create_customer_form)
+
+
+    return render_template('signup.html' , form=create_customer_form)
 
 
 @app.route('/createAdmin', methods=['GET', 'POST'])
