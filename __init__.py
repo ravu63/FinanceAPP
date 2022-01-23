@@ -597,6 +597,7 @@ def create_loan():
         loans_dict[loanentry.get_loan_id()] = loanentry
         db['Loans'] = loans_dict
         db.close()
+        print("user saved with {0} as Loan Id".format(loanentry.get_loan_id()))
         return redirect(url_for('retrieve_loans'))
     return render_template('createLoan.html', form=create_loan_form)
 
@@ -663,6 +664,7 @@ def delete_loan(id):
 
     return redirect(url_for('retrieve_Loans'))
 # END OF LOAN INIT
+
 
 if __name__ == '__main__':
     app.run()
