@@ -673,3 +673,4 @@ def delete_loan(id):
 
 if __name__ == '__main__':
     app.run()
+    FLASK_DEBUG=True
