@@ -1,11 +1,16 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
-from Forms import CreateCustomerForm, LoginForm, UpdateCustomerForm, UpdateCustomerForm2, ForgetPassword, OTPform, \
-    ChangePassword, FeedbackForm, SearchCustomerForm, UpdateStatus, CreateLoanForm, CreatePlanForm, SearchLoanForm
-import shelve, Customer, Admin, User, Feedback, Loan
+import Admin
+import Customer
+import Feedback
+import Loan
 import random
+import shelve
 from datetime import date
+
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_mail import Mail, Message
-from threading import Thread
+
+from Forms import CreateCustomerForm, LoginForm, UpdateCustomerForm, UpdateCustomerForm2, ForgetPassword, OTPform, \
+    ChangePassword, FeedbackForm, SearchCustomerForm, UpdateStatus, CreateLoanForm
 
 app = Flask(__name__)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -568,32 +573,36 @@ def show_customer():
 
 
 # APP ROUTES FOR LOAN CREATE/RETRIEVE/UPDATE/DELETE
-@app.route('/templates/Loan.html')
+@app.route('/Loan.html')
 def loans():
     return render_template('Loan.html')
 
 
 @app.route('/createLoan.html', methods=['GET', 'POST'])
-def create_Loan():
+def create_loan():
     create_loan_form = CreateLoanForm(request.form)
-    if request.method == 'POST' and create_loan_form.validate():
+    if request.method == "POST" and create_loan_form.validate():
         loans_dict = {}
         db = shelve.open('Loan.db', 'c')
+        print("User successfully saved")
         try:
             loans_dict = db['Loans']
         except:
             print("Error in retrieving Users from user.db.")
-        loanentry = Loan.Loan(create_loan_form.first_name.data, create_loan_form.last_name.data,
-                              create_loan_form.Amount.data, create_loan_form.Plan.data)
+        loanentry = Loan.Loan(create_loan_form.first_name.data,
+                              create_loan_form.last_name.data,
+                              create_loan_form.Amount.data,
+                              create_loan_form.Plan.data,
+                              create_loan_form.email.data)
         loans_dict[loanentry.get_loan_id()] = loanentry
         db['Loans'] = loans_dict
         db.close()
-        return redirect(url_for('retrieve_Loan.html'))
+        return redirect(url_for('retrieve_loans'))
     return render_template('createLoan.html', form=create_loan_form)
 
 
-@app.route('/templates/retrieveLoan.html')
-def retrieve_Loans():
+@app.route('/retrieveLoan.html')
+def retrieve_loans():
     loans_dict = {}
     db = shelve.open('Loan.db', 'r')
     loans_dict = db['Loans']
@@ -620,11 +629,12 @@ def update_Loan(id):
         loan.set_loan_name2(update_loan_form.last_name.data)
         loan.set_loan_amount(update_loan_form.Amount.data)
         loan.set_loan_plan(update_loan_form.Plan.data)
+        loan.set_loan_email(update_loan_form.email.data)
 
         db['Loans'] = loans_dict
         db.close()
 
-        return redirect(url_for('retrieve_Loans'))
+        return redirect(url_for('retrieve_loans'))
     else:
         loans_dict = {}
         db = shelve.open('Loan.db', 'r')
