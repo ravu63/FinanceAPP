@@ -20,6 +20,7 @@
             <th>Name</th>
             <th>Amount</th>
             <th>Plan</th>
+            <th>Email</th>
             <th></th>
             <th></th>
         </tr>
@@ -39,9 +40,10 @@
             {% elif Loan.get_loan_plan() == "D" %}
             <td>Diamond</td>
             {% endif %}
+            <td>{{ Loan.get_loan_email() }}</td>
             <td><a href="/updateLoan.html/{{Loan.get_loan_id()}}" class="btn btn-warning">Update</a></td>
             <td>
-                <form action="{{url_for('delete_user', id=Loan.get_loan_id())}}" method="POST">
+                <form action="{{url_for('delete_loan', id=Loan.get_loan_id())}}" method="POST">
                     <input type="submit" value="Delete" class="btn btn-danger">
                 </form>
             </td>
