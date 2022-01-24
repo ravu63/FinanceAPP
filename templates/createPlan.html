@@ -1,0 +1,42 @@
+{% extends "baseMain.html" %}
+{% block title %}Radiant Loan - Create Plan{% endblock %}
+
+{% block content %}
+{% from "includes/_formHelper.html" import render_field %}
+
+<form action="{{ url_for('index') }}" enctype="multipart/form-data" method="POST">
+    {{ form.csrf_token }}
+    <div class="row">
+        <div class="col-6 form-group">
+            <label>Plan Name</label>
+            <input type="text" name="first_name" placeholder="First Name" class="form-control">
+            {% for error in form.first_name.errors %}
+            <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+        </div>
+        <div class="col-12 form-group">
+            <label>Plan Description</label>
+            <input type="email" name="email" placeholder="Your Email" class="form-control">
+            {% for error in form.email.errors %}
+            <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+        </div>
+        <div class="col-sm-6 form-group">
+            <label>Upload Document</label>
+            <input type="file" name="document" class="form-control-file">
+            {% for error in form.document.errors %}
+            <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+        </div>
+        <div class="col-sm-6 form-group">
+            <label>Profile Image</label>
+            <input type="file" name="profile" class="form-control-file">
+            {% for error in form.profile.errors %}
+            <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+        </div>
+        <div class="col-12 form-group">
+            <button class="btn btn-primary">Upload</button>
+        </div>
+    </div>
+</form>

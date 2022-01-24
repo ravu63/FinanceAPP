@@ -1,0 +1,443 @@
+Index: templates/Loan.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>{% extends \"baseMain.html\" %}\r\n{% block title %}Radiant Finance- Loans{% endblock %}\r\n\r\n{% block content %}\r\n    <!-- START OF STYLE SHEET-->\r\n    <style>\r\n       th, td {\r\n         vertical-align: top;\r\n      }\r\n\r\n      h1, p {\r\n        align-item:center;\r\n        text-align: center;\r\n      }\r\n\r\n       .output {\r\n          font-weight: bold;\r\n      }\r\n\r\n      .card{\r\n        border: solid black 1px;\r\n        display: inline-block;\r\n        align-items: center;\r\n        min-height: 100%;\r\n        min-width: 100%;\r\n\r\n      }\r\n      .disclaimer_text_loans {\r\n        font-size: 65%;\r\n      }\r\n\r\n       #loan_table_plan {\r\n        margin-left:10%;\r\n        margin-right:10%;\r\n      }\r\n\r\n       #payment {\r\n          text-decoration: underline;\r\n      }\r\n\r\n       #graph {\r\n          border: solid black 1px;\r\n      }\r\n\r\n      #Radiant_calculator {\r\n      \tmargin-top: 5%;\r\n        margin-left: 27%;\r\n        margin-right: 30%;\r\n      }\r\n\r\n       th, td {\r\n         vertical-align: top;\r\n      }\r\n\r\n    </style>\r\n    <!-- END OF STYLE SHEET-->\r\n\r\n    <table id=\"loan_table_plan\">\r\n      <tr class=\"loan_introtext\">\r\n        <td colspan='4'><h1>Select a Loan Plan</h1></td>\r\n      </tr>\r\n      <tr class=\"loan_introtext\">\r\n        <td colspan='4'><p>Enjoy greater value with our Loan plans that offer great flexibility and low interest rates. <br>Because Radiant Finance ensurses theres a radiant solution for your darkest times</p></td>\r\n      </tr>\r\n      <tr>\r\n        <!-- Plan no.1 -->\r\n        <td>\r\n        <div class=\"card\">\r\n          <img src=\"jeans3.jpg\" alt=\"Plan-Images\" style=\"width:100%\">\r\n          <h1>Sliver loan plan</h1>\r\n          <p class=\"price\">3% Interest rate</p>\r\n          <p>This plan offers a 3% interest rate with flexible monthly payments <br>that can stretch up to 8 years* </p>\r\n          <p class=\"disclaimer_text_loans\"> **Based on loan amount</p>\r\n            <p><a href=\"/createLoan.html\" class=\"loan_plan_buttons\">Choose this plan</a></p>\r\n        </div>\r\n        </td>\r\n      </tr>\r\n    </table>\r\n\r\n    <hr>\r\n\r\n      <h1>Loan plan calculator</h1>\r\n      <p>Calculate and see what amount you could expect from our loan plans</p>\r\n      <table id=Radiant_calculator>\r\n           <tr>\r\n              <th>Enter Loan Data:</th>\r\n              <td></td>\r\n              <th>Loan Balance, Cumulative Equity, and Interest Payments</th>\r\n          </tr>\r\n\r\n          <tr>\r\n              <td>Amount of the loan ($):</td>\r\n              <td><input id=\"amount\" onchange=\"calculate();\"></td>\r\n              <td rowspan=8><canvas id=\"graph\" width=\"400\" height=\"250\"></canvas></td>\r\n          </tr>\r\n\r\n          <tr>\r\n              <td>Annual interest (%):</td>\r\n              <td><input id=\"apr\" onchange=\"calculate();\"></td>\r\n          </tr>\r\n\r\n          <tr>\r\n              <td>Repayment period (years):</td>\r\n              <td><input id=\"years\" onchange=\"calculate();\"></td>\r\n          </tr>\r\n                  <tr>\r\n                      <th>Approximate Payments:</th>\r\n                      <td><button onclick=\"calculate();\">Calculate</button></td>\r\n                  </tr>\r\n\r\n                  <tr>\r\n                      <td>Monthly payment:</td>\r\n                      <td>$<span class=\"output\" id=\"payment\"></span></td>\r\n                  </tr>\r\n\r\n                  <tr>\r\n                      <td>Total payment:</td>\r\n                      <td>$<span class=\"output\" id=\"total\"></span></td>\r\n                  </tr>\r\n\r\n                  <tr>\r\n                      <td>Total interest:</td>\r\n                      <td>$<span class=\"output\" id=\"totalinterest\"></span></td>\r\n                  </tr>\r\n      </table>\r\n  <!-- End of html-->\r\n\r\n\r\n\r\n\r\n\r\n  <!-- Start of JS -->\r\n<script>\r\n        //\"use strict\"; // Use ECMAScript 5 strict mode in browsers that support it\r\n  /*\r\n   * This script defines the calculate() function called by the event handlers\r\n   * in HTML above. The function reads values from <input> elements, calculates\r\n   * loan payment information, displays the results in <span> elements. It also\r\n   * saves the user's data, displays links to lenders, and draws a chart.\r\n   */\r\n  function calculate() {\r\n      // Look up the input and output elements in the document\r\n      var amount = document.getElementById(\"amount\");\r\n      var apr = document.getElementById(\"apr\");\r\n      var years = document.getElementById(\"years\");\r\n      var payment = document.getElementById(\"payment\");\r\n      var total = document.getElementById(\"total\");\r\n      var totalinterest = document.getElementById(\"totalinterest\");\r\n      // Get the user's input from the input elements. Assume it is all valid.\r\n      // Convert interest from a percentage to a decimal, and convert from\r\n      // an annual rate to a monthly rate. Convert payment period in years\r\n      // to the number of monthly payments.\r\n      var principal = parseFloat(amount.value);\r\n      var interest = parseFloat(apr.value) / 100 / 12;\r\n      var payments = parseFloat(years.value) * 12;\r\n      // Now compute the monthly payment figure.\r\n      var x = Math.pow(1 + interest, payments); // Math.pow() computes powers\r\n      var monthly = (principal * x * interest) / (x - 1);\r\n      // If the result is a finite number, the user's input was good and\r\n      // we have meaningful results to display\r\n      if (isFinite(monthly)) {\r\n          // Fill in the output fields, rounding to 2 decimal places\r\n          payment.innerHTML = monthly.toFixed(2);\r\n          total.innerHTML = (monthly * payments).toFixed(2);\r\n          totalinterest.innerHTML = ((monthly * payments) - principal).toFixed(2);\r\n          // Save the user's input so we can restore it the next time they visit\r\n          save(amount.value, apr.value, years.value);\r\n          // Advertise: find and display local lenders, but ignore network errors\r\n          try { // Catch any errors that occur within these curly braces\r\n              getLenders(amount.value, apr.value, years.value);\r\n          } catch (e) { /* And ignore those errors */\r\n          }\r\n          // Finally, chart loan balance, and interest and equity payments\r\n          chart(principal, interest, monthly, payments);\r\n      } else {\r\n          // Result was Not-a-Number or infinite, which means the input was\r\n          // incomplete or invalid. Clear any previously displayed output.\r\n          payment.innerHTML = \"\"; // Erase the content of these elements\r\n          total.innerHTML = \"\";\r\n          totalinterest.innerHTML = \"\";\r\n          chart(); // With no arguments, clears the chart\r\n      }\r\n  }\r\n  // Save the user's input as properties of the localStorage object. Those\r\n  // properties will still be there when the user visits in the future\r\n  // This storage feature will not work in some browsers (Firefox, e.g.) if you\r\n  // run the example from a local file:// URL. It does work over HTTP, however.\r\n  function save(amount, apr, years) {\r\n      if (window.localStorage) { // Only do this if the browser supports it\r\n          localStorage.loan_amount = amount;\r\n          localStorage.loan_apr = apr;\r\n          localStorage.loan_years = years;\r\n      }\r\n  }\r\n  // Automatically attempt to restore input fields when the document first loads.\r\n  window.onload = function () {\r\n      // If the browser supports localStorage and we have some stored data\r\n      if (window.localStorage && localStorage.loan_amount) {\r\n          document.getElementById(\"amount\").value = localStorage.loan_amount;\r\n          document.getElementById(\"apr\").value = localStorage.loan_apr;\r\n          document.getElementById(\"years\").value = localStorage.loan_years;\r\n      }\r\n  };\r\n  // Pass the user's input to a server-side script which can (in theory) return\r\n  // a list of links to local lenders interested in making loans. This example\r\n  // does not actually include a working implementation of such a lender-finding\r\n  // service. But if the service existed, this function would work with it.\r\n  function getLenders(amount, apr, years) {\r\n      // If the browser does not support the XMLHttpRequest object, do nothing\r\n      if (!window.XMLHttpRequest) return;\r\n      // Find the element to display the list of lenders in\r\n      var ad = document.getElementById(\"lenders\");\r\n      if (!ad) return; // Quit if no spot for output\r\n      // Encode the user's input as query parameters in a URL\r\n      var url = \"getLenders.php\" + // Service url plus\r\n      \"?amt=\" + encodeURIComponent(amount) + // user data in query string\r\n      \"&apr=\" + encodeURIComponent(apr) +\r\n          \"&yrs=\" + encodeURIComponent(years);\r\n      // Fetch the contents of that URL using the XMLHttpRequest object\r\n      var req = new XMLHttpRequest(); // Begin a new request\r\n      req.open(\"GET\", url); // An HTTP GET request for the url\r\n      req.send(null); // Send the request with no body\r\n      // Before returning, register an event handler function that will be called\r\n      // at some later time when the HTTP server's response arrives. This kind of\r\n      // asynchronous programming is very common in client-side JavaScript.\r\n      req.onreadystatechange = function () {\r\n          if (req.readyState == 4 && req.status == 200) {\r\n              // If we get here, we got a complete valid HTTP response\r\n              var response = req.responseText; // HTTP response as a string\r\n              var lenders = JSON.parse(response); // Parse it to a JS array\r\n              // Convert the array of lender objects to a string of HTML\r\n              var list = \"\";\r\n              for (var i = 0; i < lenders.length; i++) {\r\n                  list += \"<li><a href='\" + lenders[i].url + \"'>\" + lenders[i].name + \"</a>\";\r\n              }\r\n              // Display the HTML in the element from above.\r\n              ad.innerHTML = \"<ul>\" + list + \"</ul>\";\r\n          }\r\n      };\r\n  }\r\n  // Chart monthly loan balance, interest and equity in an HTML <canvas> element.\r\n  // If called with no arguments then just erase any previously drawn chart.\r\n  function chart(principal, interest, monthly, payments) {\r\n      var graph = document.getElementById(\"graph\"); // Get the <canvas> tag\r\n      graph.width = graph.width; // Magic to clear and reset the canvas element\r\n      // If we're called with no arguments, or if this browser does not support\r\n      // graphics in a <canvas> element, then just return now.\r\n      if (arguments.length === 0 || !graph.getContext) return;\r\n      // Get the \"context\" object for the <canvas> that defines the drawing API\r\n      var g = graph.getContext(\"2d\"); // All drawing is done with this object\r\n      var width = graph.width,\r\n          height = graph.height; // Get canvas size\r\n      // These functions convert payment numbers and dollar amounts to pixels\r\n      function paymentToX(n) {\r\n          return n * width / payments;\r\n      }\r\n\r\n      function amountToY(a) {\r\n          return height - (a * height / (monthly * payments * 1.05));\r\n      }\r\n      // Payments are a straight line from (0,0) to (payments, monthly*payments)\r\n      g.moveTo(paymentToX(0), amountToY(0)); // Start at lower left\r\n      g.lineTo(paymentToX(payments), // Draw to upper right\r\n      amountToY(monthly * payments));\r\n      g.lineTo(paymentToX(payments), amountToY(0)); // Down to lower right\r\n      g.closePath(); // And back to start\r\n      g.fillStyle = \"#f88\"; // Light red\r\n      g.fill(); // Fill the triangle\r\n      g.font = \"bold 12px sans-serif\"; // Define a font\r\n      g.fillText(\"Total Interest Payments\", 20, 20); // Draw text in legend\r\n      // Cumulative equity is non-linear and trickier to chart\r\n      var equity = 0;\r\n      g.beginPath(); // Begin a new shape\r\n      g.moveTo(paymentToX(0), amountToY(0)); // starting at lower-left\r\n      for (var p = 1; p <= payments; p++) {\r\n          // For each payment, figure out how much is interest\r\n          var thisMonthsInterest = (principal - equity) * interest;\r\n          equity += (monthly - thisMonthsInterest); // The rest goes to equity\r\n          g.lineTo(paymentToX(p), amountToY(equity)); // Line to this point\r\n      }\r\n      g.lineTo(paymentToX(payments), amountToY(0)); // Line back to X axis\r\n      g.closePath(); // And back to start point\r\n      g.fillStyle = \"green\"; // Now use green paint\r\n      g.fill(); // And fill area under curve\r\n      g.fillText(\"Total Equity\", 20, 35); // Label it in green\r\n      // Loop again, as above, but chart loan balance as a thick black line\r\n      var bal = principal;\r\n      g.beginPath();\r\n      g.moveTo(paymentToX(0), amountToY(bal));\r\n      for (var p = 1; p <= payments; p++) {\r\n          var thisMonthsInterest = bal * interest;\r\n          bal -= (monthly - thisMonthsInterest); // The rest goes to equity\r\n          g.lineTo(paymentToX(p), amountToY(bal)); // Draw line to this point\r\n      }\r\n      g.lineWidth = 3; // Use a thick line\r\n      g.stroke(); // Draw the balance curve\r\n      g.fillStyle = \"black\"; // Switch to black text\r\n      g.fillText(\"Loan Balance\", 20, 50); // Legend entry\r\n      // Now make yearly tick marks and year numbers on X axis\r\n      g.textAlign = \"center\"; // Center text over ticks\r\n      var y = amountToY(0); // Y coordinate of X axis\r\n      for (var year = 1; year * 12 <= payments; year++) { // For each year\r\n          var x = paymentToX(year * 12); // Compute tick position\r\n          g.fillRect(x - 0.5, y - 3, 1, 3); // Draw the tick\r\n          if (year == 1) g.fillText(\"Year\", x, y - 5); // Label the axis\r\n          if (year % 5 === 0 && year * 12 !== payments) // Number every 5 years\r\n          g.fillText(String(year), x, y - 5);\r\n      }\r\n      // Mark payment amounts along the right edge\r\n      g.textAlign = \"right\"; // Right-justify text\r\n      g.textBaseline = \"middle\"; // Center it vertically\r\n      var ticks = [monthly * payments, principal]; // The two points we'll mark\r\n      var rightEdge = paymentToX(payments); // X coordinate of Y axis\r\n      for (var i = 0; i < ticks.length; i++) { // For each of the 2 points\r\n          var y = amountToY(ticks[i]); // Compute Y position of tick\r\n          g.fillRect(rightEdge - 3, y - 0.5, 3, 1); // Draw the tick mark\r\n          g.fillText(String(ticks[i].toFixed(0)), // And label it.\r\n          rightEdge - 5, y);\r\n      }\r\n  }\r\n</script>\r\n\r\n\r\n{% endblock %}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/templates/Loan.html b/templates/Loan.html
+--- a/templates/Loan.html	
++++ b/templates/Loan.html	
+@@ -66,7 +66,7 @@
+         <!-- Plan no.1 -->
+         <td>
+         <div class="card">
+-          <img src="jeans3.jpg" alt="Plan-Images" style="width:100%">
++          <img src="Plan_image.jpg" alt="Plan-Images" style="width:100%">
+           <h1>Sliver loan plan</h1>
+           <p class="price">3% Interest rate</p>
+           <p>This plan offers a 3% interest rate with flexible monthly payments <br>that can stretch up to 8 years* </p>
+Index: templates/includes/_navbarMain.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><nav class=\"navbar navbar-expand-sm bg-dark navbar-dark\">\r\n  <div class=\"container-fluid\">\r\n    <a class=\"navbar-brand\" href=\"/\"> Radiant Pawn</a>\r\n    <button class=\"navbar-toggler\" type=\"button\" data-bs-toggle=\"collapse\" data-bs-target=\"#collapsibleNavbar\">\r\n      <span class=\"navbar-toggler-icon\"></span>\r\n    </button>\r\n    <div class=\"collapse navbar-collapse\" id=\"collapsibleNavbar\">\r\n      <ul class=\"navbar-nav\">\r\n        <li class=\"nav-item dropdown\">\r\n              <a class=\"nav-link dropdown-toggle\" href=\"#\" role=\"button\" data-bs-toggle=\"dropdown\">Pawn</a>\r\n              <ul class=\"dropdown-menu\">\r\n                <li> <a class=\"dropdown-item\" href=\"#\">Create Pawn</a></li>\r\n                <li><a class=\"dropdown-item\" href=\"#\">Status Check</a></li>\r\n              </ul>\r\n        </li>\r\n        <li class=\"nav-item dropdown\">\r\n              <a class=\"nav-link dropdown-toggle\" href=\"#\" role=\"button\" data-bs-toggle=\"dropdown\">Money Exchanger</a>\r\n              <ul class=\"dropdown-menu\">\r\n                <li> <a class=\"dropdown-item\" href=\"#\">Create</a></li>\r\n                  <li><a class=\"dropdown-item\" href=\"#\">Status Check</a></li>\r\n              </ul>\r\n        </li>\r\n         <li class=\"nav-item dropdown\">\r\n              <a class=\"nav-link dropdown-toggle\" href=\"#\" role=\"button\" data-bs-toggle=\"dropdown\">Loan</a>\r\n              <ul class=\"dropdown-menu\">\r\n                <li> <a class=\"dropdown-item\" href=\"/retrieveLoan.html\">Retrieve</a></li>\r\n                  <li><a class=\"dropdown-item\" href=\"/Loan.html\">Create Loan</a></li>\r\n                  <li><a class=\"dropdown-item\" href=\"#\">Create Plan (WIP DUN PRESS)</a></li>\r\n              </ul>\r\n        </li>\r\n          <li class=\"nav-item dropdown\">\r\n              <a class=\"nav-link dropdown-toggle\" href=\"#\" role=\"button\" data-bs-toggle=\"dropdown\">Account Management</a>\r\n              <ul class=\"dropdown-menu\">\r\n                <li><a class=\"dropdown-item\" href=\"/manageAccount/{{session.get('id')}}\">Manage Account</a></li>\r\n                  <li><a class=\"dropdown-item\" href=\"/changePassword/{{session.get('id')}}\">Change Password</a></li>\r\n                   <li><a class=\"dropdown-item\" href=\"/feedback/{{session.get('id')}}\">Feedback</a></li>\r\n                  <li><a class=\"dropdown-item\" href=\"/viewFeedback/{{session.get('id')}}\">View Feedback</a></li>\r\n              </ul>\r\n        </li>\r\n      </ul>\r\n        <ul class = \"like\">\r\n        <div class = \"Loke\">\r\n          <li class=\"nav-item\">\r\n              <a class=\"nav-link\" href=\"/logout\">Log Out</a>\r\n          </li>\r\n        </div>\r\n        </ul>\r\n    </div>\r\n  </div>\r\n</nav>\r\n\r\n<style>\r\n.like {\r\n                display: flex;\r\n                flex-direction: column;\r\n                margin-left: auto;\r\n                margin-bottom: 0;\r\n                list-style: none;\r\n        }\r\n</style>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/templates/includes/_navbarMain.html b/templates/includes/_navbarMain.html
+--- a/templates/includes/_navbarMain.html	
++++ b/templates/includes/_navbarMain.html	
+@@ -25,7 +25,7 @@
+               <ul class="dropdown-menu">
+                 <li> <a class="dropdown-item" href="/retrieveLoan.html">Retrieve</a></li>
+                   <li><a class="dropdown-item" href="/Loan.html">Create Loan</a></li>
+-                  <li><a class="dropdown-item" href="#">Create Plan (WIP DUN PRESS)</a></li>
++                  <li><a class="dropdown-item" href="/createPlan.html">Create Plan (WIP DUN PRESS)</a></li>
+               </ul>
+         </li>
+           <li class="nav-item dropdown">
+Index: templates/retrieveLoan.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>{% extends \"baseMain.html\" %}\r\n{% block title %}Library Loan System - Retrieve Users{% endblock %}\r\n\r\n{% block content %}\r\n<h1 class=\"display-4\">Retrieve Loans</h1>\r\n<div>\r\n    {% if count == 0 %}\r\n    <p>There are no Loans.</p>\r\n    {% elif count == 1 %}\r\n    <p>There is 1 Loan.</p>\r\n    {% else %}\r\n    <p>There are {{ count }} Loans.</p>\r\n    {% endif %}\r\n</div>\r\n<div>\r\n    <table class=\"table table-striped\">\r\n        <thead>\r\n        <tr>\r\n            <th>User ID</th>\r\n            <th>Name</th>\r\n            <th>Amount</th>\r\n            <th>Plan</th>\r\n            <th>Email</th>\r\n            <th></th>\r\n            <th></th>\r\n        </tr>\r\n        </thead>\r\n        <tbody>\r\n        {% for Loan in loans_lists %}\r\n        <tr>\r\n            <td>{{ Loan.get_loan_id() }}</td>\r\n            <td>{{ Loan.get_loan_name() }}</td>\r\n            <td>{{ Loan.get_loan_amount() }}</td>\r\n            {% if Loan.get_loan_plan() == \"S\" %}\r\n            <td>Silver</td>\r\n            {% elif Loan.get_loan_plan() == \"G\" %}\r\n            <td>Gold</td>\r\n            {% elif Loan.get_loan_plan() == \"P\" %}\r\n            <td>Platinum</td>\r\n            {% elif Loan.get_loan_plan() == \"D\" %}\r\n            <td>Diamond</td>\r\n            {% endif %}\r\n            <td>{{ Loan.get_loan_email() }}</td>\r\n            <td><a href=\"/updateLoan.html/{{Loan.get_loan_id()}}\" class=\"btn btn-warning\">Update</a></td>\r\n            <td>\r\n                <form action=\"{{url_for('delete_loan', id=Loan.get_loan_id())}}\" method=\"POST\">\r\n                    <input type=\"submit\" value=\"Delete\" class=\"btn btn-danger\">\r\n                </form>\r\n            </td>\r\n        </tr>\r\n        {% endfor %}\r\n\r\n\r\n        </tbody>\r\n    </table>\r\n</div>\r\n{% endblock %}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/templates/retrieveLoan.html b/templates/retrieveLoan.html
+--- a/templates/retrieveLoan.html	
++++ b/templates/retrieveLoan.html	
+@@ -19,7 +19,6 @@
+             <th>User ID</th>
+             <th>Name</th>
+             <th>Amount</th>
+-            <th>Plan</th>
+             <th>Email</th>
+             <th></th>
+             <th></th>
+@@ -31,15 +30,6 @@
+             <td>{{ Loan.get_loan_id() }}</td>
+             <td>{{ Loan.get_loan_name() }}</td>
+             <td>{{ Loan.get_loan_amount() }}</td>
+-            {% if Loan.get_loan_plan() == "S" %}
+-            <td>Silver</td>
+-            {% elif Loan.get_loan_plan() == "G" %}
+-            <td>Gold</td>
+-            {% elif Loan.get_loan_plan() == "P" %}
+-            <td>Platinum</td>
+-            {% elif Loan.get_loan_plan() == "D" %}
+-            <td>Diamond</td>
+-            {% endif %}
+             <td>{{ Loan.get_loan_email() }}</td>
+             <td><a href="/updateLoan.html/{{Loan.get_loan_id()}}" class="btn btn-warning">Update</a></td>
+             <td>
+Index: Forms.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from wtforms import Form, StringField, validators, PasswordField, SelectField, ValidationError, TextAreaField\r\nfrom wtforms.fields import EmailField, DateField, FileField, IntegerField, RadioField, SearchField\r\n\r\n\r\nclass LoginForm(Form):\r\n    email = EmailField('Email', [validators.Email(), validators.DataRequired()])\r\n    password = PasswordField('Password', [validators.Length(min=10, max=150), validators.DataRequired()])\r\n\r\n\r\nclass CreateCustomerForm(Form):\r\n    name = StringField('Name', [validators.Length(min=3, max=150), validators.DataRequired()])\r\n    gender = SelectField('Gender', [validators.DataRequired()],\r\n                         choices=[('', 'Select'), ('F', 'Female'), ('M', 'Male')], default='')\r\n    phone = StringField('Phone', [validators.Length(min=8, max=8), validators.DataRequired()])\r\n    birthdate = DateField('Birthdate', format='%Y-%m-%d')\r\n    email = EmailField('Email', [validators.Email(), validators.DataRequired()])\r\n    password = PasswordField('Password', [validators.Length(min=10, max=150), validators.DataRequired(),\r\n                                          validators.EqualTo('confirmpassword', message='Error:Passwords must match')])\r\n    confirmpassword = PasswordField('Confirm Password', [validators.DataRequired()])\r\n\r\n    def validate_phone(self, phone):\r\n        if not phone.data[1:8].isdigit():\r\n            raise ValidationError(\"Phone number must not contain letters\")\r\n\r\n\r\nclass SearchCustomerForm(Form):\r\n    searchCustomer = StringField('Search Customer', [validators.DataRequired()])\r\n\r\n\r\nclass UpdateCustomerForm(Form):\r\n    name = StringField('Name', [validators.Length(min=3, max=150), validators.DataRequired()])\r\n    gender = SelectField('Gender', [validators.DataRequired()],\r\n                         choices=[('', 'Select'), ('F', 'Female'), ('M', 'Male')], default='')\r\n    phone = StringField('Phone', [validators.Length(min=8, max=8), validators.DataRequired()])\r\n    birthdate = DateField('Birthdate', format='%Y-%m-%d')\r\n    email = EmailField('Email', [validators.Email(), validators.DataRequired()])\r\n\r\n    def validate_phone(self, phone):\r\n        if not phone.data[1:8].isdigit():\r\n            raise ValidationError(\"Phone number must not contain letters\")\r\n\r\n\r\nclass FeedbackForm(Form):\r\n    name = StringField('Name', [validators.Length(min=3, max=150), validators.DataRequired()])\r\n    service = SelectField('Rate our Service', [validators.DataRequired()],\r\n                          choices=[('', 'Select'), ('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), ('5', '5')],\r\n                          default='')\r\n    website = SelectField('Rate our Website', [validators.DataRequired()],\r\n                          choices=[('', 'Select'), ('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), ('5', '5')],\r\n                          default='')\r\n    email = EmailField('Email', [validators.Email(), validators.DataRequired()])\r\n    additional = TextAreaField('Additional feedback')\r\n\r\n\r\nclass UpdateCustomerForm2(Form):\r\n    password = PasswordField('Password', [validators.Length(min=10, max=150), validators.DataRequired(),\r\n                                          validators.EqualTo('confirmpassword', message='Error:Passwords must match')])\r\n    confirmpassword = PasswordField('Confirm Password', [validators.DataRequired()])\r\n\r\n\r\nclass UpdateStatus(Form):\r\n    name = StringField('Name', [validators.Length(min=3, max=150), validators.DataRequired()],\r\n                       render_kw={'readonly': True})\r\n    service = SelectField('Rate our Service', [validators.DataRequired()],\r\n                          choices=[('', 'Select'), ('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), ('5', '5')],\r\n                          default='', render_kw={'readonly': True})\r\n    website = SelectField('Rate our Website', [validators.DataRequired()],\r\n                          choices=[('', 'Select'), ('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), ('5', '5')],\r\n                          default='', render_kw={'readonly': True})\r\n    email = EmailField('Email', [validators.Email(), validators.DataRequired()], render_kw={'readonly': True})\r\n    additional = TextAreaField('Additional feedback', render_kw={'readonly': True})\r\n    date = DateField('Date of Creation', format='%Y-%m-%d', render_kw={'readonly': True})\r\n    status = SelectField('Status', [validators.DataRequired()],\r\n                         choices=[('Processing', 'Processing'), ('Processed', 'Processed')],\r\n                         default='Processing')\r\n\r\n\r\nclass ForgetPassword(Form):\r\n    email = EmailField('Email', [validators.Email(), validators.DataRequired()])\r\n\r\n\r\nclass OTPform(Form):\r\n    otp = StringField('OTP', [validators.DataRequired()])\r\n\r\n\r\nclass ChangePassword(Form):\r\n    password = PasswordField('Password', [validators.EqualTo('confirmpassword', message='Error:Passwords must match')])\r\n    confirmpassword = PasswordField('Confirm Password')\r\n\r\n\r\n# START OF LOAN FORMS\r\n\r\nclass CreateLoanForm(Form):\r\n    first_name = StringField('First Name', [validators.Length(min=1, max=150), validators.DataRequired()])\r\n    last_name = StringField('Last Name', [validators.Length(min=1, max=150), validators.DataRequired()])\r\n    Amount = IntegerField('Amount $', [validators.NumberRange(min=1, max=999999), validators.DataRequired()])\r\n    Plan = RadioField('Loan Plan:', choices=[('S', 'Silver'), ('G', 'Gold'), ('P', 'Platinum'), ('D', 'Diamond')],\r\n                      default='S')\r\n    email = EmailField('Email address', [validators.DataRequired(), validators.Email()])\r\n\r\n\r\nclass CreatePlanForm(Form):\r\n    Plan_name = StringField('Plan Name', [validators.Length(min=1, max=150), validators.DataRequired()])\r\n    Plan_Des = StringField('Plan Description', [validators.Length(min=1, max=300), validators.DataRequired()])\r\n    Plan_interest = IntegerField('Interest', [validators.NumberRange(min=1, max=100), validators.DataRequired()])\r\n    Plan_image = FileField('Plan Image', [validators.DataRequired()])\r\n\r\n\r\nclass SearchLoanForm(Form):\r\n    Loan_search = SearchField('Enter Loan Id', [validators.Length(min=1, max=7), validators.DataRequired])\r\n\r\n# END OF LOAN FORMS\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Forms.py b/Forms.py
+--- a/Forms.py	
++++ b/Forms.py	
+@@ -1,5 +1,6 @@
+ from wtforms import Form, StringField, validators, PasswordField, SelectField, ValidationError, TextAreaField
+ from wtforms.fields import EmailField, DateField, FileField, IntegerField, RadioField, SearchField
++import flask_wtf.file
+ 
+ 
+ class LoginForm(Form):
+@@ -94,8 +95,6 @@
+     first_name = StringField('First Name', [validators.Length(min=1, max=150), validators.DataRequired()])
+     last_name = StringField('Last Name', [validators.Length(min=1, max=150), validators.DataRequired()])
+     Amount = IntegerField('Amount $', [validators.NumberRange(min=1, max=999999), validators.DataRequired()])
+-    Plan = RadioField('Loan Plan:', choices=[('S', 'Silver'), ('G', 'Gold'), ('P', 'Platinum'), ('D', 'Diamond')],
+-                      default='S')
+     email = EmailField('Email address', [validators.DataRequired(), validators.Email()])
+ 
+ 
+@@ -103,7 +102,8 @@
+     Plan_name = StringField('Plan Name', [validators.Length(min=1, max=150), validators.DataRequired()])
+     Plan_Des = StringField('Plan Description', [validators.Length(min=1, max=300), validators.DataRequired()])
+     Plan_interest = IntegerField('Interest', [validators.NumberRange(min=1, max=100), validators.DataRequired()])
+-    Plan_image = FileField('Plan Image', [validators.DataRequired()])
++    Plan_image = FileField('Profile', validators=[flask_wtf.file.FileRequired(),
++                                                  flask_wtf.file.FileAllowed(['jpg', 'png'], 'Images only!')])
+ 
+ 
+ class SearchLoanForm(Form):
+Index: __init__.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import Admin\r\nimport Customer\r\nimport Feedback\r\nimport Loan\r\nimport random\r\nimport shelve\r\nfrom datetime import date\r\n\r\nfrom flask import Flask, render_template, request, redirect, url_for, session, flash\r\nfrom flask_mail import Mail, Message\r\n\r\nfrom Forms import CreateCustomerForm, LoginForm, UpdateCustomerForm, UpdateCustomerForm2, ForgetPassword, OTPform, \\\r\n    ChangePassword, FeedbackForm, SearchCustomerForm, UpdateStatus, CreateLoanForm\r\n\r\napp = Flask(__name__)\r\napp.config['MAIL_SERVER'] = 'smtp.gmail.com'\r\napp.config['MAIL_PORT'] = 587\r\napp.config['MAIL_DEBUG'] = True\r\napp.config['MAIL_USE_TLS'] = True\r\napp.config['MAIL_USE_SSL'] = False\r\napp.config['MAIL_USERNAME'] = \"radiantfinancenyp@gmail.com\"\r\napp.config['MAIL_PASSWORD'] = \"Radiant12345\"\r\n\r\nmail = Mail(app)\r\n\r\napp = Flask(__name__)\r\napp.config['SECRET_KEY'] = 'mysecret'\r\napp.static_folder = 'static'\r\n\r\n\r\n@app.route('/', methods=['GET', 'POST'])\r\ndef home():\r\n    return render_template('home.html')\r\n\r\n\r\n@app.route('/main', methods=['GET', 'POST'])\r\ndef main():\r\n    return render_template('main.html')\r\n\r\n\r\n@app.route('/dashboard', methods=['GET', 'POST'])\r\ndef dashboard():\r\n    return render_template('dashboard.html')\r\n\r\n\r\n# Joshua\r\n@app.errorhandler(404)\r\ndef page_not_found(e):\r\n    return render_template('error404.html'), 404\r\n\r\n\r\n@app.route('/login', methods=['GET', 'POST'])\r\ndef login():\r\n    login_form = LoginForm(request.form)\r\n    if request.method == 'POST':\r\n        users = shelve.open('signup.db', 'r')\r\n        email = request.form['email']\r\n        password = request.form['password']\r\n        users_dict = users['Customers']\r\n\r\n        users_keys = list(users_dict.keys())\r\n        try:\r\n            user = users_dict[email]\r\n            if user.get_email() == email:\r\n                if user.check_password(password):\r\n                    if user.get_role() == 0:\r\n                        session['id'] = user.get_email()\r\n                        users.close()\r\n                        return redirect(url_for('main'))\r\n                    else:\r\n                        users.close()\r\n                        return redirect(url_for('dashboard'))\r\n                else:\r\n                    flash(u'Invalid password or email provided')\r\n            else:\r\n                flash(u'Invalid password or email provided')\r\n        except:\r\n            flash(u'Invalid password or email provided')\r\n\r\n    return render_template('login.html', form=login_form)\r\n\r\n\r\n@app.route('/signup', methods=['GET', 'POST'])\r\ndef signup():\r\n    create_customer_form = CreateCustomerForm(request.form)\r\n    if request.method == 'POST' and create_customer_form.validate():\r\n        customers_dict = {}\r\n        db = shelve.open('signup.db', 'c')\r\n\r\n        try:\r\n            customers_dict = db['Customers']\r\n        except:\r\n            print(\"Error in retrieving Customers from customer.db.\")\r\n        try:\r\n            user = shelve.open('signup.db', 'r')\r\n            users_dict = user['Customers']\r\n            users_keys = list(users_dict.keys())\r\n            if create_customer_form.email.data in users_keys:\r\n                flash(u'User exists')\r\n            else:\r\n                customer = Customer.Customer(\r\n                    create_customer_form.name.data,\r\n                    create_customer_form.gender.data,\r\n                    create_customer_form.phone.data,\r\n                    create_customer_form.birthdate.data,\r\n                    create_customer_form.email.data,\r\n                    create_customer_form.password.data\r\n                )\r\n                customers_dict[customer.get_email()] = customer\r\n                db['Customers'] = customers_dict\r\n                db.close()\r\n                return redirect(url_for('login'))\r\n\r\n        except:\r\n            customer = Customer.Customer(\r\n                create_customer_form.name.data,\r\n                create_customer_form.gender.data,\r\n                create_customer_form.phone.data,\r\n                create_customer_form.birthdate.data,\r\n                create_customer_form.email.data,\r\n                create_customer_form.password.data\r\n            )\r\n            customers_dict[customer.get_email()] = customer\r\n            db['Customers'] = customers_dict\r\n            db.close()\r\n            return redirect(url_for('login'))\r\n\r\n    return render_template('signup.html', form=create_customer_form)\r\n\r\n\r\n@app.route('/createAdmin', methods=['GET', 'POST'])\r\ndef create_admin():\r\n    create_customer_form = CreateCustomerForm(request.form)\r\n    if request.method == 'POST' and create_customer_form.validate():\r\n        customers_dict = {}\r\n        db = shelve.open('signup.db', 'c')\r\n\r\n        try:\r\n            customers_dict = db['Customers']\r\n        except:\r\n            print(\"Error in retrieving Customers from customer.db.\")\r\n\r\n        try:\r\n            user = shelve.open('signup.db', 'r')\r\n            users_dict = user['Customers']\r\n            users_keys = list(users_dict.keys())\r\n            if create_customer_form.email.data in users_keys:\r\n                flash(u'User exists')\r\n            else:\r\n                customer = Admin.Customer(\r\n                    create_customer_form.name.data,\r\n                    create_customer_form.gender.data,\r\n                    create_customer_form.phone.data,\r\n                    create_customer_form.birthdate.data,\r\n                    create_customer_form.email.data,\r\n                    create_customer_form.password.data\r\n                )\r\n                customers_dict[customer.get_email()] = customer\r\n                db['Customers'] = customers_dict\r\n                db.close()\r\n                return redirect(url_for('manage_admin'))\r\n\r\n        except:\r\n            customer = Admin.Customer(\r\n                create_customer_form.name.data,\r\n                create_customer_form.gender.data,\r\n                create_customer_form.phone.data,\r\n                create_customer_form.birthdate.data,\r\n                create_customer_form.email.data,\r\n                create_customer_form.password.data\r\n            )\r\n            customers_dict[customer.get_email()] = customer\r\n            db['Customers'] = customers_dict\r\n            db.close()\r\n            return redirect(url_for('manage_admin'))\r\n    return render_template('createAdmin.html', form=create_customer_form)\r\n\r\n\r\n@app.route('/manageCustomer', methods=['GET', 'POST'])\r\ndef manage_customers():\r\n    customers_dict = {}\r\n    db = shelve.open('signup.db', 'r')\r\n    customers_dict = db['Customers']\r\n    db.close()\r\n\r\n    customers_list = []\r\n    for key in customers_dict:\r\n        customer = customers_dict.get(key)\r\n        customers_list.append(customer)\r\n    return render_template('manageCustomer.html', count=len(customers_list), customers_list=customers_list)\r\n\r\n\r\n@app.route('/manageAdmin', methods=['GET', 'POST'])\r\ndef manage_admin():\r\n    customers_dict = {}\r\n    db = shelve.open('signup.db', 'r')\r\n    customers_dict = db['Customers']\r\n    db.close()\r\n\r\n    customers_list = []\r\n    for key in customers_dict:\r\n        customer = customers_dict.get(key)\r\n        customers_list.append(customer)\r\n    return render_template('manageAdmin.html', count=len(customers_list), customers_list=customers_list)\r\n\r\n\r\n@app.route('/updateCustomer/<id>/', methods=['GET', 'POST'])\r\ndef customer_user(id):\r\n    update_customer_form = UpdateCustomerForm(request.form)\r\n\r\n    if request.method == 'POST' and update_customer_form.validate():\r\n        customer_dict = {}\r\n        db = shelve.open('signup.db', 'w')\r\n        customer_dict = db['Customers']\r\n\r\n        customer = customer_dict.get(id)\r\n        customer.set_name(update_customer_form.name.data)\r\n        customer.set_email(update_customer_form.email.data)\r\n        customer.set_gender(update_customer_form.gender.data)\r\n        customer.set_birthdate(update_customer_form.birthdate.data)\r\n        customer.set_phone(update_customer_form.phone.data)\r\n\r\n        db['Customers'] = customer_dict\r\n        db.close()\r\n\r\n        return redirect(url_for('manage_customers'))\r\n    else:\r\n        users_dict = {}\r\n        db = shelve.open('signup.db', 'r')\r\n        customer_dict = db['Customers']\r\n        db.close()\r\n\r\n        customer = customer_dict.get(id)\r\n        update_customer_form.name.data = customer.get_name()\r\n        update_customer_form.email.data = customer.get_email()\r\n        update_customer_form.gender.data = customer.get_gender()\r\n        update_customer_form.birthdate.data = customer.get_birthdate()\r\n        update_customer_form.phone.data = customer.get_phone()\r\n\r\n        return render_template('updateCustomer.html', form=update_customer_form)\r\n\r\n\r\n@app.route('/updateAdmin/<id>/', methods=['GET', 'POST'])\r\ndef customer_Admin(id):\r\n    update_customer_form = UpdateCustomerForm(request.form)\r\n\r\n    if request.method == 'POST' and update_customer_form.validate():\r\n        customer_dict = {}\r\n        db = shelve.open('signup.db', 'w')\r\n        customer_dict = db['Customers']\r\n\r\n        customer = customer_dict.get(id)\r\n        customer.set_name(update_customer_form.name.data)\r\n        customer.set_email(update_customer_form.email.data)\r\n        customer.set_gender(update_customer_form.gender.data)\r\n        customer.set_birthdate(update_customer_form.birthdate.data)\r\n        customer.set_phone(update_customer_form.phone.data)\r\n\r\n        db['Customers'] = customer_dict\r\n        db.close()\r\n\r\n        return redirect(url_for('manage_admin'))\r\n    else:\r\n        users_dict = {}\r\n        db = shelve.open('signup.db', 'r')\r\n        customer_dict = db['Customers']\r\n        db.close()\r\n\r\n        customer = customer_dict.get(id)\r\n        update_customer_form.name.data = customer.get_name()\r\n        update_customer_form.email.data = customer.get_email()\r\n        update_customer_form.gender.data = customer.get_gender()\r\n        update_customer_form.birthdate.data = customer.get_birthdate()\r\n        update_customer_form.phone.data = customer.get_phone()\r\n\r\n        return render_template('updateCustomer.html', form=update_customer_form)\r\n\r\n\r\n@app.route('/deleteCustomer/<id>', methods=['POST'])\r\ndef delete_customer(id):\r\n    customer_dict = {}\r\n    db = shelve.open('signup.db', 'w')\r\n    customer_dict = db['Customers']\r\n\r\n    customer_dict.pop(id)\r\n\r\n    db['Customers'] = customer_dict\r\n    db.close()\r\n\r\n    return redirect(url_for('manage_customers'))\r\n\r\n\r\n@app.route('/deleteAdmin/<id>', methods=['POST'])\r\ndef delete_admin(id):\r\n    customer_dict = {}\r\n    db = shelve.open('signup.db', 'w')\r\n    customer_dict = db['Customers']\r\n\r\n    customer_dict.pop(id)\r\n\r\n    db['Customers'] = customer_dict\r\n    db.close()\r\n\r\n    return redirect(url_for('manage_admin'))\r\n\r\n\r\n@app.route('/logout', methods=['POST', 'GET'])\r\ndef logout():\r\n    session.clear()\r\n    return redirect(url_for('home'))\r\n\r\n\r\n@app.route('/forgotPassword', methods=['POST', 'GET'])\r\ndef forgot_password():\r\n    login_form = ForgetPassword(request.form)\r\n    try:\r\n        if request.method == 'POST':\r\n            users = shelve.open('signup.db', 'r')\r\n            email = request.form['email']\r\n            users_dict = users['Customers']\r\n            users_keys = list(users_dict.keys())\r\n            user = users_dict[email]\r\n            if user.get_email() == email:\r\n                session['id'] = user.get_email()\r\n                users.close()\r\n                return redirect(url_for('getOTP'))\r\n            else:\r\n                flash(u'Invalid email provided')\r\n    except:\r\n        flash(u'Invalid email provided')\r\n\r\n    return render_template('forgotPassword.html', form=login_form)\r\n\r\n\r\n@app.route('/getOTP', methods=['POST', 'GET'])\r\ndef getOTP():\r\n    if request.method == 'POST':\r\n        otp = random.randint(1111, 9999)\r\n        session['otp'] = otp\r\n        msg = Message('One Time Password', sender='radiantfinancenyp@gmail.com', recipients=[session['id']])\r\n        msg.body = 'here is your OTP:{}'.format(otp)\r\n        mail.send(msg)\r\n        return redirect(url_for('OTP'))\r\n    return render_template('getOTP.html')\r\n\r\n\r\n@app.route('/OTP', methods=['POST', 'GET'])\r\ndef OTP():\r\n    login_form = OTPform(request.form)\r\n    if request.method == 'POST':\r\n        otp = session['otp']\r\n        otp2 = int(request.form['otp3'])\r\n        if otp == otp2:\r\n            return redirect(url_for('change_password', id=id))\r\n        else:\r\n            flash(u'Invalid OTP provided')\r\n    return render_template('OTP.html', form=login_form)\r\n\r\n\r\n@app.route('/changePassword/<id>', methods=['POST', 'GET'])\r\ndef change_password(id):\r\n    update_customer_form = UpdateCustomerForm2(request.form)\r\n    id = session['id']\r\n\r\n    if request.method == 'POST' and update_customer_form.validate():\r\n        customer_dict = {}\r\n        db = shelve.open('signup.db', 'w')\r\n        customer_dict = db['Customers']\r\n\r\n        customer = customer_dict.get(id)\r\n        customer.set_password(update_customer_form.password.data)\r\n\r\n        db['Customers'] = customer_dict\r\n        db.close()\r\n\r\n        return redirect(url_for('login'))\r\n    return render_template('customerChangePass.html', form=update_customer_form)\r\n\r\n\r\n@app.route('/manageAccount/<id>/', methods=['GET', 'POST'])\r\ndef manage_account(id):\r\n    update_customer_form = UpdateCustomerForm(request.form)\r\n    if request.method == 'POST' and update_customer_form.validate():\r\n        customer_dict = {}\r\n        db = shelve.open('signup.db', 'w')\r\n        customer_dict = db['Customers']\r\n\r\n        customer = customer_dict.get(id)\r\n        customer.set_name(update_customer_form.name.data)\r\n        customer.set_email(update_customer_form.email.data)\r\n        customer.set_phone(update_customer_form.phone.data)\r\n        customer.set_gender(update_customer_form.gender.data)\r\n        customer.set_birthdate(update_customer_form.birthdate.data)\r\n\r\n        db['Customers'] = customer_dict\r\n        db.close()\r\n\r\n        return redirect(url_for('main'))\r\n    else:\r\n        users_dict = {}\r\n        db = shelve.open('signup.db', 'r')\r\n        customer_dict = db['Customers']\r\n        db.close()\r\n\r\n        customer = customer_dict.get(id)\r\n        update_customer_form.name.data = customer.get_name()\r\n        update_customer_form.email.data = customer.get_email()\r\n        update_customer_form.gender.data = customer.get_gender()\r\n        update_customer_form.phone.data = customer.get_phone()\r\n        update_customer_form.birthdate.data = customer.get_birthdate()\r\n\r\n    return render_template('manageAccount.html', form=update_customer_form)\r\n\r\n\r\n@app.route('/customerChangePass/<id>/', methods=['GET', 'POST'])\r\ndef customer_change(id):\r\n    update_customer_form = ChangePassword(request.form)\r\n    if request.method == 'POST' and update_customer_form.validate():\r\n        customer_dict = {}\r\n        db = shelve.open('signup.db', 'w')\r\n        customer_dict = db['Customers']\r\n\r\n        customer = customer_dict.get(id)\r\n        customer.set_password(update_customer_form.password.data)\r\n\r\n        db['Customers'] = customer_dict\r\n        db.close()\r\n\r\n        return redirect(url_for('main'))\r\n    else:\r\n        users_dict = {}\r\n        db = shelve.open('signup.db', 'r')\r\n        customer_dict = db['Customers']\r\n        db.close()\r\n\r\n        customer = customer_dict.get(id)\r\n        update_customer_form.password.data = customer.get_password()\r\n\r\n    return render_template('customerChangePass.html', form=update_customer_form)\r\n\r\n\r\n@app.route('/searchCustomer', methods=['GET', 'POST'])\r\ndef search_customer():\r\n    search_customer_form = SearchCustomerForm(request.form)\r\n    if request.method == 'POST' and search_customer_form.validate():\r\n        search = search_customer_form.searchCustomer.data\r\n        customer_dict = {}\r\n        db = shelve.open('signup.db', 'r')\r\n        customer_dict = db['Customers']\r\n        db.close()\r\n\r\n        customer_list = []\r\n        for key in customer_dict:\r\n            customer = customer_dict.get(key)\r\n            if search in customer.get_email():\r\n                if customer.get_role() == 0:\r\n                    customer_list.append(customer)\r\n            # else:\r\n            # continue\r\n\r\n        if len(customer_list) > 0:\r\n            return render_template('showCustomer.html', count=len(customer_list), customer_list=customer_list)\r\n        else:\r\n            return redirect(url_for('no_customer'))\r\n    return render_template('searchCustomer.html', form=search_customer_form)\r\n\r\n\r\n@app.route('/searchAdmin', methods=['GET', 'POST'])\r\ndef search_admin():\r\n    search_customer_form = SearchCustomerForm(request.form)\r\n    if request.method == 'POST' and search_customer_form.validate():\r\n        search = search_customer_form.searchCustomer.data\r\n        customer_dict = {}\r\n        db = shelve.open('signup.db', 'r')\r\n        customer_dict = db['Customers']\r\n        db.close()\r\n\r\n        customer_list = []\r\n        for key in customer_dict:\r\n            customer = customer_dict.get(key)\r\n            if search in customer.get_email():\r\n                if customer.get_role() == 1:\r\n                    customer_list.append(customer)\r\n            # else:\r\n            # continue\r\n\r\n        if len(customer_list) > 0:\r\n            return render_template('showAdmin.html', count=len(customer_list), customer_list=customer_list)\r\n        else:\r\n            return redirect(url_for('no_customer'))\r\n    return render_template('searchCustomer.html', form=search_customer_form)\r\n\r\n\r\n@app.route('/feedback/<id>/', methods=['GET', 'POST'])\r\ndef create_feedback(id):\r\n    create_feedback_form = FeedbackForm(request.form)\r\n    if request.method == 'POST' and create_feedback_form.validate():\r\n        feedback_dict = {}\r\n        db = shelve.open('feedback.db', 'c')\r\n\r\n        try:\r\n            feedback_dict = db['Feedback']\r\n        except:\r\n            print(\"Error in retrieving Customers from Feedback.db.\")\r\n\r\n        feedback = Feedback.Feedback(\r\n            create_feedback_form.name.data,\r\n            create_feedback_form.email.data,\r\n            create_feedback_form.service.data,\r\n            create_feedback_form.website.data,\r\n            create_feedback_form.additional.data\r\n\r\n        )\r\n        feedback.set_status('Processing')\r\n        today = date.today()\r\n        feedback.set_date(today)\r\n        feedback_dict[feedback.get_email()] = feedback\r\n        db['Feedback'] = feedback_dict\r\n        db.close()\r\n        return redirect(url_for('main'))\r\n    else:\r\n        customer_dict = {}\r\n        db = shelve.open('signup.db', 'r')\r\n        customer_dict = db['Customers']\r\n        db.close()\r\n\r\n        customer = customer_dict.get(id)\r\n        create_feedback_form.name.data = customer.get_name()\r\n        create_feedback_form.email.data = customer.get_email()\r\n    return render_template('feedback.html', form=create_feedback_form)\r\n\r\n\r\n@app.route('/manageFeedback', methods=['GET', 'POST'])\r\ndef manage_feedback():\r\n    feedback_dict = {}\r\n    db = shelve.open('feedback.db', 'r')\r\n    feedback_dict = db['Feedback']\r\n    db.close()\r\n\r\n    feedback_list = []\r\n    for key in feedback_dict:\r\n        feedback = feedback_dict.get(key)\r\n        feedback_list.append(feedback)\r\n    return render_template('manageFeedback.html', count=len(feedback_list), feedback_list=feedback_list)\r\n\r\n\r\n@app.route('/updateFeedback/<id>/', methods=['GET', 'POST'])\r\ndef update_status(id):\r\n    update_customer_form = UpdateStatus(request.form)\r\n\r\n    if request.method == 'POST' and update_customer_form.validate():\r\n        customer_dict = {}\r\n        db = shelve.open('feedback.db', writeback=True)\r\n        customer_dict = db['Feedback']\r\n\r\n        customer = customer_dict.get(id)\r\n        customer.set_name(update_customer_form.name.data)\r\n        customer.set_email(update_customer_form.email.data)\r\n        customer.set_service(update_customer_form.service.data)\r\n        customer.set_website(update_customer_form.website.data)\r\n        customer.set_additional(update_customer_form.additional.data)\r\n        customer.set_date(update_customer_form.date.data)\r\n        customer.set_status(update_customer_form.status.data)\r\n\r\n        db['Customers'] = customer_dict\r\n        db.sync()\r\n        db.close()\r\n\r\n        return redirect(url_for('manage_feedback'))\r\n    else:\r\n        users_dict = {}\r\n        db = shelve.open('feedback.db', 'r')\r\n        customer_dict = db['Feedback']\r\n        db.close()\r\n\r\n        customer = customer_dict.get(id)\r\n        update_customer_form.name.data = customer.get_name()\r\n        update_customer_form.email.data = customer.get_email()\r\n        update_customer_form.service.data = customer.get_service()\r\n        update_customer_form.website.data = customer.get_website()\r\n        update_customer_form.additional.data = customer.get_additional()\r\n        update_customer_form.date.data = customer.get_date()\r\n        update_customer_form.status.data = customer.get_status()\r\n\r\n        return render_template('updateStatus.html', form=update_customer_form)\r\n\r\n\r\n@app.route('/viewFeedback/<id>/', methods=['GET', 'POST'])\r\ndef view_feedback(id):\r\n    feedback_dict = {}\r\n    db = shelve.open('feedback.db', 'r')\r\n    feedback_dict = db['Feedback']\r\n    db.close()\r\n\r\n    feedback_list = []\r\n    for key in feedback_dict:\r\n        feedback = feedback_dict.get(key)\r\n        if feedback.get_email() == session['id']:\r\n            feedback_list.append(feedback)\r\n        else:\r\n            continue\r\n    return render_template('viewFeedback.html', count=len(feedback_list), feedback_list=feedback_list)\r\n\r\n\r\n@app.route('/deleteFeedback/<id>', methods=['POST'])\r\ndef delete_feedback(id):\r\n    customer_dict = {}\r\n    db = shelve.open('feedback.db', 'w')\r\n    customer_dict = db['Feedback']\r\n\r\n    customer_dict.pop(id)\r\n\r\n    db['Feedback'] = customer_dict\r\n    db.close()\r\n\r\n    return redirect(url_for('manage_feedback'))\r\n\r\n\r\n@app.route('/noCustomer')\r\ndef no_customer():\r\n    return render_template('noCustomer.html')\r\n\r\n\r\n@app.route('/showCustomer')\r\ndef show_customer():\r\n    return render_template('showCustomer.html')\r\n\r\n\r\n# Joshua\r\n\r\n# APP ROUTES FOR LOAN CREATE/RETRIEVE/UPDATE/DELETE\r\n@app.route('/Loan.html')\r\ndef loans():\r\n    return render_template('Loan.html')\r\n\r\n\r\n@app.route('/createLoan.html', methods=['GET', 'POST'])\r\ndef create_loan():\r\n    create_loan_form = CreateLoanForm(request.form)\r\n    if request.method == \"POST\" and create_loan_form.validate():\r\n        loans_dict = {}\r\n        db = shelve.open('Loan.db', 'c')\r\n        print(\"User successfully saved\")\r\n        try:\r\n            loans_dict = db['Loans']\r\n        except:\r\n            print(\"Error in retrieving Users from user.db.\")\r\n        loanentry = Loan.Loan(create_loan_form.first_name.data,\r\n                              create_loan_form.last_name.data,\r\n                              create_loan_form.Amount.data,\r\n                              create_loan_form.Plan.data,\r\n                              create_loan_form.email.data)\r\n        loans_dict[loanentry.get_loan_id()] = loanentry\r\n        db['Loans'] = loans_dict\r\n        db.close()\r\n        print(\"user saved with {0} as Loan Id\".format(loanentry.get_loan_id()))\r\n        return redirect(url_for('retrieve_loans'))\r\n    return render_template('createLoan.html', form=create_loan_form)\r\n\r\n\r\n@app.route('/retrieveLoan.html')\r\ndef retrieve_loans():\r\n    loans_dict = {}\r\n    db = shelve.open('Loan.db', 'r')\r\n    loans_dict = db['Loans']\r\n    db.close()\r\n\r\n    loans_list = []\r\n    for key in loans_dict:\r\n        loan = loans_dict.get(key)\r\n        loans_list.append(loan)\r\n\r\n    return render_template('retrieveLoan.html', count=len(loans_list), loans_lists=loans_list)\r\n\r\n\r\n@app.route('/updateLoan.html/<int:id>/', methods=['GET', 'POST'])\r\ndef update_Loan(id):\r\n    update_loan_form = CreateLoanForm(request.form)\r\n    if request.method == 'POST' and update_loan_form.validate():\r\n        loans_dict = {}\r\n        db = shelve.open('Loan.db', 'w')\r\n        loans_dict = db['Loans']\r\n\r\n        loan = loans_dict.get(id)\r\n        loan.set_loan_name1(update_loan_form.first_name.data)\r\n        loan.set_loan_name2(update_loan_form.last_name.data)\r\n        loan.set_loan_amount(update_loan_form.Amount.data)\r\n        loan.set_loan_plan(update_loan_form.Plan.data)\r\n        loan.set_loan_email(update_loan_form.email.data)\r\n\r\n        db['Loans'] = loans_dict\r\n        db.close()\r\n\r\n        return redirect(url_for('retrieve_loans'))\r\n    else:\r\n        loans_dict = {}\r\n        db = shelve.open('Loan.db', 'r')\r\n        loans_dict = db['Loans']\r\n        db.close()\r\n\r\n        loan = loans_dict.get(id)\r\n        update_loan_form.first_name.data = loan.get_loan_first()\r\n        update_loan_form.last_name.data = loan.get_loan_last()\r\n        update_loan_form.Amount.data = loan.get_loan_amount()\r\n        update_loan_form.Plan.data = loan.get_loan_plan()\r\n\r\n        return render_template('updateLoan.html', form=update_loan_form)\r\n\r\n\r\n@app.route('/deleteLoan/<int:id>', methods=['POST'])\r\ndef delete_loan(id):\r\n    loans_dict = {}\r\n    db = shelve.open('Loan.db', 'w')\r\n    loans_dict = db['Loans']\r\n\r\n    loans_dict.pop(id)\r\n\r\n    db['Loans'] = loans_dict\r\n    db.close()\r\n\r\n    return redirect(url_for('retrieve_Loans'))\r\n\r\n\r\n# END OF LOAN INIT\r\n\r\n\r\nif __name__ == '__main__':\r\n    app.run()\r\n    FLASK_DEBUG = True\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/__init__.py b/__init__.py
+--- a/__init__.py	
++++ b/__init__.py	
+@@ -4,13 +4,19 @@
+ import Loan
+ import random
+ import shelve
++import os
++import Plan
+ from datetime import date
++from werkzeug.utils import secure_filename
+ 
+ from flask import Flask, render_template, request, redirect, url_for, session, flash
+ from flask_mail import Mail, Message
++from flask_wtf.csrf import CSRFProtect
+ 
+ from Forms import CreateCustomerForm, LoginForm, UpdateCustomerForm, UpdateCustomerForm2, ForgetPassword, OTPform, \
+-    ChangePassword, FeedbackForm, SearchCustomerForm, UpdateStatus, CreateLoanForm
++    ChangePassword, FeedbackForm, SearchCustomerForm, UpdateStatus, CreateLoanForm, CreatePlanForm
++
++csrf = CSRFProtect()
+ 
+ app = Flask(__name__)
+ app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+@@ -20,6 +26,8 @@
+ app.config['MAIL_USE_SSL'] = False
+ app.config['MAIL_USERNAME'] = "radiantfinancenyp@gmail.com"
+ app.config['MAIL_PASSWORD'] = "Radiant12345"
++app.config['SECRET_KEY'] = '325245hkhf486axcv5719bf9397cbn69xv'
++app.config['MAX_CONTENT_LENGTH'] = 4 * 1024 * 1024  # 4MB max-limit.
+ 
+ mail = Mail(app)
+ 
+@@ -648,7 +656,6 @@
+         loanentry = Loan.Loan(create_loan_form.first_name.data,
+                               create_loan_form.last_name.data,
+                               create_loan_form.Amount.data,
+-                              create_loan_form.Plan.data,
+                               create_loan_form.email.data)
+         loans_dict[loanentry.get_loan_id()] = loanentry
+         db['Loans'] = loans_dict
+@@ -685,7 +692,6 @@
+         loan.set_loan_name1(update_loan_form.first_name.data)
+         loan.set_loan_name2(update_loan_form.last_name.data)
+         loan.set_loan_amount(update_loan_form.Amount.data)
+-        loan.set_loan_plan(update_loan_form.Plan.data)
+         loan.set_loan_email(update_loan_form.email.data)
+ 
+         db['Loans'] = loans_dict
+@@ -702,7 +708,7 @@
+         update_loan_form.first_name.data = loan.get_loan_first()
+         update_loan_form.last_name.data = loan.get_loan_last()
+         update_loan_form.Amount.data = loan.get_loan_amount()
+-        update_loan_form.Plan.data = loan.get_loan_plan()
++        update_loan_form.email.data = loan.get_loan_email()
+ 
+         return render_template('updateLoan.html', form=update_loan_form)
+ 
+@@ -721,6 +727,22 @@
+     return redirect(url_for('retrieve_Loans'))
+ 
+ 
++# @app.route('/createPlan.html', methods=['GET', 'POST'])
++# def create_plan():
++#     plan_create_form = CreatePlanForm(request.form)
++#     if request.method == "POST" and plan_create_form.validate():
++#
++#         assets_dir = os.path.join(
++#             os.path.dirname(app.instance_path), 'assets'
++#         )
++#         d = plan_create_form.Plan_image.data
++#
++#         planimage = secure_filename(d.filename)
++#         d.save( os.path.join(assets_dir, planimage))
++#         flash('Document uploaded successfully.')
++#         return redirect(url_for('retrieve_plan'))
++#
++#     return render_template('createPlan.html', form=plan_create_form)
+ # END OF LOAN INIT
+ 
+ 
+Index: templates/createLoan.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>{% extends \"baseMain.html\" %}\r\n{% block title %}Radiant Loan - Create Loan{% endblock %}\r\n\r\n{% block content %}\r\n{% from \"includes/_formHelper.html\" import render_field %}\r\n\r\n<h1 class=\"display-4\">Create Loan</h1>\r\n\r\n<form method='POST' action=\"\">\r\n    <div class=\"form-group\">\r\n        {{ render_field(form.first_name, class=\"form-control\") }}\r\n    </div>\r\n    <div class=\"form-group\">\r\n        {{ render_field(form.last_name, class=\"form-control\") }}\r\n    </div>\r\n    <div class=\"form-group\">\r\n        {{ render_field(form.Amount, class=\"form-control\") }}\r\n    </div>\r\n    <div class=\"form-group\">\r\n        {{ render_field(form.Plan, class=\"form-check\", style=\"list-style-type:none\") }}\r\n    </div>\r\n    <div class=\"form-group\">\r\n        {{ render_field(form.email, class=\"form-check\", style=\"list-style-type:none\") }}\r\n    </div>\r\n    <input type=\"submit\" value=\"Submit\" class=\"btn btn-primary\"/>\r\n</form>\r\n{% endblock %}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/templates/createLoan.html b/templates/createLoan.html
+--- a/templates/createLoan.html	
++++ b/templates/createLoan.html	
+@@ -17,9 +17,6 @@
+         {{ render_field(form.Amount, class="form-control") }}
+     </div>
+     <div class="form-group">
+-        {{ render_field(form.Plan, class="form-check", style="list-style-type:none") }}
+-    </div>
+-    <div class="form-group">
+         {{ render_field(form.email, class="form-check", style="list-style-type:none") }}
+     </div>
+     <input type="submit" value="Submit" class="btn btn-primary"/>
+Index: Loan.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>class Loan:\r\n    count_id = 0\r\n\r\n    # Loan init\r\n    def __init__(self, First_name, Last_name, amount, plan, email):\r\n        Loan.count_id += 1\r\n        self.__LoanId = Loan.count_id\r\n        self.__FirstName = First_name\r\n        self.__LastName = Last_name\r\n        self.__amount = amount\r\n        self.__plan = plan\r\n        self.__email = email\r\n\r\n    # Loan getter method\r\n\r\n    def get_loan_id(self):\r\n        return self.__LoanId\r\n\r\n    def get_loan_name(self):\r\n        return self.__FirstName + \" \" + self.__LastName\r\n\r\n    def get_loan_first(self):\r\n        return self.__FirstName\r\n\r\n    def get_loan_last(self):\r\n        return self.__LastName\r\n\r\n    def get_loan_plan(self):\r\n        return self.__plan\r\n\r\n    def get_loan_amount(self):\r\n        return self.__amount\r\n\r\n    def get_loan_email(self):\r\n        return self.__email\r\n\r\n    # Loan setter method\r\n\r\n    def set_loan_id(self, new_loan_id):\r\n        self.__LoanId = new_loan_id\r\n\r\n    def set_loan_name1(self, new_loan_first_name):\r\n        self.__FirstName = new_loan_first_name\r\n\r\n    def set_loan_name2(self, new_loan_last_name):\r\n        self.__LastName = new_loan_last_name\r\n\r\n    def set_loan_plan(self, plan):\r\n        self.__plan = plan\r\n\r\n    def set_loan_amount(self, amount):\r\n        self.__amount = amount\r\n\r\n    def set_loan_email(self, email):\r\n        self.__email = email\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Loan.py b/Loan.py
+--- a/Loan.py	
++++ b/Loan.py	
+@@ -2,13 +2,12 @@
+     count_id = 0
+ 
+     # Loan init
+-    def __init__(self, First_name, Last_name, amount, plan, email):
++    def __init__(self, First_name, Last_name, amount, email):
+         Loan.count_id += 1
+         self.__LoanId = Loan.count_id
+         self.__FirstName = First_name
+         self.__LastName = Last_name
+         self.__amount = amount
+-        self.__plan = plan
+         self.__email = email
+ 
+     # Loan getter method
+@@ -25,8 +24,6 @@
+     def get_loan_last(self):
+         return self.__LastName
+ 
+-    def get_loan_plan(self):
+-        return self.__plan
+ 
+     def get_loan_amount(self):
+         return self.__amount
+@@ -45,9 +42,6 @@
+     def set_loan_name2(self, new_loan_last_name):
+         self.__LastName = new_loan_last_name
+ 
+-    def set_loan_plan(self, plan):
+-        self.__plan = plan
+-
+     def set_loan_amount(self, amount):
+         self.__amount = amount
+ 
+Index: templates/includes/_navbarHome.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><nav class=\"navbar navbar-expand-sm bg-dark navbar-dark\">\r\n  <div class=\"container-fluid\">\r\n    <a class=\"navbar-brand\" href=\"/\"> Radiant Pawn</a>\r\n    <button class=\"navbar-toggler\" type=\"button\" data-bs-toggle=\"collapse\" data-bs-target=\"#collapsibleNavbar\">\r\n      <span class=\"navbar-toggler-icon\"></span>\r\n    </button>\r\n    <div class=\"collapse navbar-collapse\" id=\"collapsibleNavbar\">\r\n      <ul class=\"navbar-nav\">\r\n        <li class=\"nav-item dropdown\">\r\n              <a class=\"nav-link dropdown-toggle\" href=\"#\" role=\"button\" data-bs-toggle=\"dropdown\">Pawn</a>\r\n              <ul class=\"dropdown-menu\">\r\n                <li> <a class=\"dropdown-item\" href=\"/login\">Create Pawn</a></li>\r\n                <li><a class=\"dropdown-item\" href=\"/login\">Status Check</a></li>\r\n              </ul>\r\n        </li>\r\n        <li class=\"nav-item dropdown\">\r\n              <a class=\"nav-link dropdown-toggle\" href=\"#\" role=\"button\" data-bs-toggle=\"dropdown\">Money Exchanger</a>\r\n              <ul class=\"dropdown-menu\">\r\n                <li> <a class=\"dropdown-item\" href=\"/login\">Create</a></li>\r\n                  <li><a class=\"dropdown-item\" href=\"/login\">Status Check</a></li>\r\n              </ul>\r\n        </li>\r\n         <li class=\"nav-item dropdown\">\r\n              <a class=\"nav-link dropdown-toggle\" href=\"templates/Loan.html\" role=\"button\" data-bs-toggle=\"dropdown\">Loan</a>\r\n             <ul class=\"dropdown-menu\">\r\n                 <li> <a class=\"dropdown-item\" href=\"/retrieveLoan.html\">Retrieve</a></li>\r\n                 <li><a class=\"dropdown-item\" href=\"/Loan.html\">Create Loan</a></li>\r\n                 <li><a class=\"dropdown-item\" href=\"#\">Create Plan (WIP DUN PRESS)</a></li>\r\n             </ul>\r\n        </li>\r\n        <div class = \"Loke\">\r\n          <ul class = \"navbar-nav ml-auto \" >\r\n            <li class=\"nav-item\">\r\n              <a class=\"nav-link\" href=\"/login\">Log In</a>\r\n            </li>\r\n            <li class=\"nav-item\">\r\n              <a class=\"nav-link\" href=\"/signup\">Sign up</a>\r\n            </li>\r\n          </ul>\r\n        </div>\r\n      </ul>\r\n    </div>\r\n  </div>\r\n</nav>\r\n\r\n<style>\r\n.navbar-nav {\r\n            margin-left: auto;\r\n        }\r\n</style>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/templates/includes/_navbarHome.html b/templates/includes/_navbarHome.html
+--- a/templates/includes/_navbarHome.html	
++++ b/templates/includes/_navbarHome.html	
+@@ -25,7 +25,7 @@
+              <ul class="dropdown-menu">
+                  <li> <a class="dropdown-item" href="/retrieveLoan.html">Retrieve</a></li>
+                  <li><a class="dropdown-item" href="/Loan.html">Create Loan</a></li>
+-                 <li><a class="dropdown-item" href="#">Create Plan (WIP DUN PRESS)</a></li>
++                 <li><a class="dropdown-item" href="/createPlan.html">Create Plan (WIP DUN PRESS)</a></li>
+              </ul>
+         </li>
+         <div class = "Loke">
+Index: templates/createPlan.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/templates/createPlan.html b/templates/createPlan.html
+new file mode 100644
+--- /dev/null	
++++ b/templates/createPlan.html	
+@@ -0,0 +1,42 @@
++{% extends "baseMain.html" %}
++{% block title %}Radiant Loan - Create Plan{% endblock %}
++
++{% block content %}
++{% from "includes/_formHelper.html" import render_field %}
++
++<form action="{{ url_for('index') }}" enctype="multipart/form-data" method="POST">
++    {{ form.csrf_token }}
++    <div class="row">
++        <div class="col-6 form-group">
++            <label>Plan Name</label>
++            <input type="text" name="first_name" placeholder="First Name" class="form-control">
++            {% for error in form.first_name.errors %}
++            <small class="text-danger">{{ error }}</small>
++            {% endfor %}
++        </div>
++        <div class="col-12 form-group">
++            <label>Plan Description</label>
++            <input type="email" name="email" placeholder="Your Email" class="form-control">
++            {% for error in form.email.errors %}
++            <small class="text-danger">{{ error }}</small>
++            {% endfor %}
++        </div>
++        <div class="col-sm-6 form-group">
++            <label>Upload Document</label>
++            <input type="file" name="document" class="form-control-file">
++            {% for error in form.document.errors %}
++            <small class="text-danger">{{ error }}</small>
++            {% endfor %}
++        </div>
++        <div class="col-sm-6 form-group">
++            <label>Profile Image</label>
++            <input type="file" name="profile" class="form-control-file">
++            {% for error in form.profile.errors %}
++            <small class="text-danger">{{ error }}</small>
++            {% endfor %}
++        </div>
++        <div class="col-12 form-group">
++            <button class="btn btn-primary">Upload</button>
++        </div>
++    </div>
++</form>
+\ No newline at end of file
+Index: Plan.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Plan.py b/Plan.py
+new file mode 100644
+--- /dev/null	
++++ b/Plan.py	
+@@ -0,0 +1,49 @@
++class Plan:
++    count_id = 0
++
++    # Loan init
++    def __init__(self, Plan_name, Plan_description, Plan_interest, image):
++        Plan.count_id += 1
++        self.__PlanId = Plan.count_id
++        self.__Plan_name = Plan_name
++        self.__Plan_description = Plan_description
++        self.__Plan_interest = Plan_interest
++        self.__Plan_image = image
++
++    # Loan getter method
++
++    def get_loan_plan_id(self):
++        return self.__PlanId
++
++    def get_loan_plan_name(self):
++        return self.__Plan_name
++
++    def get_loan_plan_desc(self):
++        return self.__Plan_description
++
++    def get_loan_plan_int(self):
++        return self.__Plan_interest
++
++    def get_loan_plan_image(self):
++        return self.__Plan_image
++
++
++    # Loan setter method
++
++    def set_loan_id(self, new_loan_id):
++        self.__LoanId = new_loan_id
++
++    def set_loan_name1(self, new_loan_first_name):
++        self.__FirstName = new_loan_first_name
++
++    def set_loan_name2(self, new_loan_last_name):
++        self.__LastName = new_loan_last_name
++
++    def set_loan_plan(self, plan):
++        self.__plan = plan
++
++    def set_loan_amount(self, amount):
++        self.__amount = amount
++
++    def set_loan_email(self, email):
++        self.__email = email
+Index: Loan.db.bak
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>'Loans', (0, 297)\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Loan.db.bak b/Loan.db.bak
+--- a/Loan.db.bak	
++++ b/Loan.db.bak	
+@@ -1,1 +1,1 @@
+-'Loans', (0, 297)
++'Loans', (0, 6)
+Index: Loan.db.dat
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>�\u0003}q\u0000(K\u0001cLoan\nLoan\nq\u0001)�q\u0002}q\u0003(X\r\u0000\u0000\u0000_Loan__LoanIdq\u0004K\u0001X\u0010\u0000\u0000\u0000_Loan__FirstNameq\u0005X\u0004\u0000\u0000\u0000liewq\u0006X\u000F\u0000\u0000\u0000_Loan__LastNameq\u0007X\u0003\u0000\u0000\u0000xunq\bX\r\u0000\u0000\u0000_Loan__amountq\tJ��\t\u0000X\u000B\u0000\u0000\u0000_Loan__planq\nX\u0001\u0000\u0000\u0000Sq\u000BX\f\u0000\u0000\u0000_Loan__emailq\fX\u0012\u0000\u0000\u0000xavierhx@gmail.comq\rubK\u0002h\u0001)�q\u000E}q\u000F(h\u0004K\u0002h\u0005X\u0004\u0000\u0000\u0000liewq\u0010h\u0007X\u0003\u0000\u0000\u0000xunq\u0011h\tJ8�\r\u0000h\nh\u000Bh\fX\u0012\u0000\u0000\u0000xavierhx@gmail.comq\u0012ubu.
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Loan.db.dat b/Loan.db.dat
+--- a/Loan.db.dat	
++++ b/Loan.db.dat	
+@@ -1,9 +1,10 @@
+-�}q (KcLoan
++�}q .cLoan
+ Loan
+ q)�q}q(X
+-   _Loan__LoanIdqKX   _Loan__FirstNameqX   liewqX   _Loan__LastNameqX   xunqX
+-   _Loan__amountq	J��	 X   _Loan__planq
++   _Loan__LoanIdqKX   _Loan__FirstNameqX   liewqX   _Loan__LastNameqX   xunqX
++   _Loan__amountq	J8�
++ X   _Loan__planq
+ X   SqX   _Loan__emailqX   xavierhx@gmail.comq
+-ubKh)�q}q(hKhX   liewqhX   xunqh	J8�
++ubs.h)�q}q(hKhX   liewqhX   xunqh	J8�
+  h
+ hhX   xavierhx@gmail.comqubu.
+\ No newline at end of file
+Index: Loan.db.dir
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>'Loans', (0, 297)\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Loan.db.dir b/Loan.db.dir
+--- a/Loan.db.dir	
++++ b/Loan.db.dir	
+@@ -1,1 +1,1 @@
+-'Loans', (0, 297)
++'Loans', (0, 6)

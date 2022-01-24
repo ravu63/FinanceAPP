@@ -1,5 +1,6 @@
 from wtforms import Form, StringField, validators, PasswordField, SelectField, ValidationError, TextAreaField
 from wtforms.fields import EmailField, DateField, FileField, IntegerField, RadioField, SearchField
+import flask_wtf.file
 from flask_wtf.recaptcha import RecaptchaField
 
 
@@ -97,8 +98,6 @@ class CreateLoanForm(Form):
     first_name = StringField('First Name', [validators.Length(min=1, max=150), validators.DataRequired()])
     last_name = StringField('Last Name', [validators.Length(min=1, max=150), validators.DataRequired()])
     Amount = IntegerField('Amount $', [validators.NumberRange(min=1, max=999999), validators.DataRequired()])
-    Plan = RadioField('Loan Plan:', choices=[('S', 'Silver'), ('G', 'Gold'), ('P', 'Platinum'), ('D', 'Diamond')],
-                      default='S')
     email = EmailField('Email address', [validators.DataRequired(), validators.Email()])
 
 
@@ -106,7 +105,8 @@ class CreatePlanForm(Form):
     Plan_name = StringField('Plan Name', [validators.Length(min=1, max=150), validators.DataRequired()])
     Plan_Des = StringField('Plan Description', [validators.Length(min=1, max=300), validators.DataRequired()])
     Plan_interest = IntegerField('Interest', [validators.NumberRange(min=1, max=100), validators.DataRequired()])
-    Plan_image = FileField('Plan Image', [validators.DataRequired()])
+    Plan_image = FileField('Profile', validators=[flask_wtf.file.FileRequired(),
+                                                  flask_wtf.file.FileAllowed(['jpg', 'png'], 'Images only!')])
 
 
 class SearchLoanForm(Form):
