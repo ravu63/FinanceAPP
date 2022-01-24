@@ -18,6 +18,7 @@ class CreateCustomerForm(Form):
     password = PasswordField('Password', [validators.Length(min=10, max=150), validators.DataRequired(),
                                           validators.EqualTo('confirmpassword', message='Error:Passwords must match')])
     confirmpassword = PasswordField('Confirm Password', [validators.DataRequired()])
+    recaptcha = RecaptchaField()
 
     def validate_phone(self, phone):
         if not phone.data[1:8].isdigit():
@@ -35,7 +36,7 @@ class UpdateCustomerForm(Form):
     phone = StringField('Phone', [validators.Length(min=8, max=8), validators.DataRequired()])
     birthdate = DateField('Birthdate', format='%Y-%m-%d')
     email = EmailField('Email', [validators.Email(), validators.DataRequired()])
-    recaptcha = RecaptchaField()
+
 
     def validate_phone(self, phone):
         if not phone.data[1:8].isdigit():
