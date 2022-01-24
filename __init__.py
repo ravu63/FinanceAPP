@@ -31,17 +31,24 @@ app.static_folder = 'static'
 @app.route('/', methods=['GET', 'POST'])
 def home():
     return render_template('home.html')
+
+
 @app.route('/main', methods=['GET', 'POST'])
 def main():
     return render_template('main.html')
+
+
 @app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
     return render_template('dashboard.html')
 
-#Joshua
+
+# Joshua
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('error404.html'), 404
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     login_form = LoginForm(request.form)
@@ -118,8 +125,7 @@ def signup():
             db.close()
             return redirect(url_for('login'))
 
-
-    return render_template('signup.html' , form=create_customer_form)
+    return render_template('signup.html', form=create_customer_form)
 
 
 @app.route('/createAdmin', methods=['GET', 'POST'])
@@ -618,7 +624,9 @@ def no_customer():
 @app.route('/showCustomer')
 def show_customer():
     return render_template('showCustomer.html')
-#Joshua
+
+
+# Joshua
 
 # APP ROUTES FOR LOAN CREATE/RETRIEVE/UPDATE/DELETE
 @app.route('/Loan.html')
@@ -711,9 +719,11 @@ def delete_loan(id):
     db.close()
 
     return redirect(url_for('retrieve_Loans'))
+
+
 # END OF LOAN INIT
 
 
 if __name__ == '__main__':
     app.run()
-    FLASK_DEBUG=True
+    FLASK_DEBUG = True
