@@ -301,6 +301,7 @@ input[type=button]:active, input[type=submit]:active, input[type=reset]:active  
     <div class="form-group">
     {{ render_field(form.confirmpassword, class="form-control") }}
   </div>
+
   <input type="submit" value="Submit" class="btn btn-primary"/>
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}

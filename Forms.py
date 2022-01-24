@@ -1,5 +1,7 @@
 from wtforms import Form, StringField, validators, PasswordField, SelectField, ValidationError, TextAreaField
 from wtforms.fields import EmailField, DateField, FileField, IntegerField, RadioField, SearchField
+import flask_wtf.file
+from flask_wtf.recaptcha import RecaptchaField
 
 
 class LoginForm(Form):
@@ -18,6 +20,7 @@ class CreateCustomerForm(Form):
                                           validators.EqualTo('confirmpassword', message='Error:Passwords must match')])
     confirmpassword = PasswordField('Confirm Password', [validators.DataRequired()])
 
+
     def validate_phone(self, phone):
         if not phone.data[1:8].isdigit():
             raise ValidationError("Phone number must not contain letters")
@@ -34,6 +37,7 @@ class UpdateCustomerForm(Form):
     phone = StringField('Phone', [validators.Length(min=8, max=8), validators.DataRequired()])
     birthdate = DateField('Birthdate', format='%Y-%m-%d')
     email = EmailField('Email', [validators.Email(), validators.DataRequired()])
+
 
     def validate_phone(self, phone):
         if not phone.data[1:8].isdigit():
@@ -94,8 +98,6 @@ class CreateLoanForm(Form):
     first_name = StringField('First Name', [validators.Length(min=1, max=150), validators.DataRequired()])
     last_name = StringField('Last Name', [validators.Length(min=1, max=150), validators.DataRequired()])
     Amount = IntegerField('Amount $', [validators.NumberRange(min=1, max=999999), validators.DataRequired()])
-    Plan = RadioField('Loan Plan:', choices=[('S', 'Silver'), ('G', 'Gold'), ('P', 'Platinum'), ('D', 'Diamond')],
-                      default='S')
     email = EmailField('Email address', [validators.DataRequired(), validators.Email()])
 
 
@@ -103,7 +105,8 @@ class CreatePlanForm(Form):
     Plan_name = StringField('Plan Name', [validators.Length(min=1, max=150), validators.DataRequired()])
     Plan_Des = StringField('Plan Description', [validators.Length(min=1, max=300), validators.DataRequired()])
     Plan_interest = IntegerField('Interest', [validators.NumberRange(min=1, max=100), validators.DataRequired()])
-    Plan_image = FileField('Plan Image', [validators.DataRequired()])
+    Plan_image = FileField('Profile', validators=[flask_wtf.file.FileRequired(),
+                                                  flask_wtf.file.FileAllowed(['jpg', 'png'], 'Images only!')])
 
 
 class SearchLoanForm(Form):

@@ -19,7 +19,6 @@
             <th>User ID</th>
             <th>Name</th>
             <th>Amount</th>
-            <th>Plan</th>
             <th>Email</th>
             <th></th>
             <th></th>
@@ -31,15 +30,6 @@
             <td>{{ Loan.get_loan_id() }}</td>
             <td>{{ Loan.get_loan_name() }}</td>
             <td>{{ Loan.get_loan_amount() }}</td>
-            {% if Loan.get_loan_plan() == "S" %}
-            <td>Silver</td>
-            {% elif Loan.get_loan_plan() == "G" %}
-            <td>Gold</td>
-            {% elif Loan.get_loan_plan() == "P" %}
-            <td>Platinum</td>
-            {% elif Loan.get_loan_plan() == "D" %}
-            <td>Diamond</td>
-            {% endif %}
             <td>{{ Loan.get_loan_email() }}</td>
             <td><a href="/updateLoan.html/{{Loan.get_loan_id()}}" class="btn btn-warning">Update</a></td>
             <td>

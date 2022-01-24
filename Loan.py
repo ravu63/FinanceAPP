@@ -2,13 +2,12 @@ class Loan:
     count_id = 0
 
     # Loan init
-    def __init__(self, First_name, Last_name, amount, plan, email):
+    def __init__(self, First_name, Last_name, amount, email):
         Loan.count_id += 1
         self.__LoanId = Loan.count_id
         self.__FirstName = First_name
         self.__LastName = Last_name
         self.__amount = amount
-        self.__plan = plan
         self.__email = email
 
     # Loan getter method
@@ -25,8 +24,6 @@ class Loan:
     def get_loan_last(self):
         return self.__LastName
 
-    def get_loan_plan(self):
-        return self.__plan
 
     def get_loan_amount(self):
         return self.__amount
@@ -44,9 +41,6 @@ class Loan:
 
     def set_loan_name2(self, new_loan_last_name):
         self.__LastName = new_loan_last_name
-
-    def set_loan_plan(self, plan):
-        self.__plan = plan
 
     def set_loan_amount(self, amount):
         self.__amount = amount
