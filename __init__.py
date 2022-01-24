@@ -4,13 +4,19 @@ import Feedback
 import Loan
 import random
 import shelve
+import os
+import Plan
 from datetime import date
+from werkzeug.utils import secure_filename
 
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_mail import Mail, Message
+from flask_wtf.csrf import CSRFProtect
 
 from Forms import CreateCustomerForm, LoginForm, UpdateCustomerForm, UpdateCustomerForm2, ForgetPassword, OTPform, \
-    ChangePassword, FeedbackForm, SearchCustomerForm, UpdateStatus, CreateLoanForm
+    ChangePassword, FeedbackForm, SearchCustomerForm, UpdateStatus, CreateLoanForm, CreatePlanForm
+
+csrf = CSRFProtect()
 
 app = Flask(__name__)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -20,6 +26,8 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_USERNAME'] = "radiantfinancenyp@gmail.com"
 app.config['MAIL_PASSWORD'] = "Radiant12345"
+app.config['SECRET_KEY'] = '325245hkhf486axcv5719bf9397cbn69xv'
+app.config['MAX_CONTENT_LENGTH'] = 4 * 1024 * 1024  # 4MB max-limit.
 
 mail = Mail(app)
 
@@ -707,7 +715,6 @@ def create_loan():
         loanentry = Loan.Loan(create_loan_form.first_name.data,
                               create_loan_form.last_name.data,
                               create_loan_form.Amount.data,
-                              create_loan_form.Plan.data,
                               create_loan_form.email.data)
         loans_dict[loanentry.get_loan_id()] = loanentry
         db['Loans'] = loans_dict
@@ -744,7 +751,6 @@ def update_Loan(id):
         loan.set_loan_name1(update_loan_form.first_name.data)
         loan.set_loan_name2(update_loan_form.last_name.data)
         loan.set_loan_amount(update_loan_form.Amount.data)
-        loan.set_loan_plan(update_loan_form.Plan.data)
         loan.set_loan_email(update_loan_form.email.data)
 
         db['Loans'] = loans_dict
@@ -761,7 +767,7 @@ def update_Loan(id):
         update_loan_form.first_name.data = loan.get_loan_first()
         update_loan_form.last_name.data = loan.get_loan_last()
         update_loan_form.Amount.data = loan.get_loan_amount()
-        update_loan_form.Plan.data = loan.get_loan_plan()
+        update_loan_form.email.data = loan.get_loan_email()
 
         return render_template('updateLoan.html', form=update_loan_form)
 
@@ -780,6 +786,22 @@ def delete_loan(id):
     return redirect(url_for('retrieve_Loans'))
 
 
+# @app.route('/createPlan.html', methods=['GET', 'POST'])
+# def create_plan():
+#     plan_create_form = CreatePlanForm(request.form)
+#     if request.method == "POST" and plan_create_form.validate():
+#
+#         assets_dir = os.path.join(
+#             os.path.dirname(app.instance_path), 'assets'
+#         )
+#         d = plan_create_form.Plan_image.data
+#
+#         planimage = secure_filename(d.filename)
+#         d.save( os.path.join(assets_dir, planimage))
+#         flash('Document uploaded successfully.')
+#         return redirect(url_for('retrieve_plan'))
+#
+#     return render_template('createPlan.html', form=plan_create_form)
 # END OF LOAN INIT
 
 
