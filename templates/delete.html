@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Delete Transaction</title>
+</head>
+    <header>Delete</header>
+<br>
+    <form action ="/deleteTransaction" method="POST">
+        <div class="select-box">
+            <select name="tId">
+            {% for trans in transactions %}
+            <option value = "{{trans}}" SELECTED>{{trans}}</option>
+            {% endfor %}
+        </select>
+        </div>
+               <div class = "display-box">
+            {% for obj in objects %}
+            <p>{{obj}}</p>
+        </div>
+        {% endfor %}
+        {% if details %}
+        <div class ="detail-box">
+        <p>Details: {{ details }} </p>
+            <br>
+        {% endif %}
+            {% if deleted %}
+        <p>Transaction ID {{deleted}} successfully removed.</p>
+            {% endif %}
+        </div>
+        <button style="margin:5px;" name="check" type="submit" value="check">Check Transaction</button>
+        <button style="margin:5px;" name="delete" type="submit" value="delete">Delete Transaction</button>
+    </form>
+</html>
