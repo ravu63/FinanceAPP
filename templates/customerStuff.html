@@ -1,8 +1,9 @@
-{% extends "base2.html" %}
+{% extends "baseDashboard.html" %}
 {% block title %}Radiant Finance - Customer detials{% endblock %}
 
 {% block content %}
 <h1 class="display-4">Customer stuff</h1>
+<!--
 <h2>Pawn</h2>
 <div>
   <table class="table table-striped">
@@ -37,7 +38,7 @@
             <input type="submit" value="Delete" class="btn btn-danger">
           </form>
 
-          <!-- The Modal -->
+
 
             </form>
           </td>
@@ -47,19 +48,18 @@
     </tbody>
   </table>
 </div>
-
+-->
 <h2>Loan</h2>
 <div>
   <table class="table table-striped">
     <thead>
       <tr>
+        <th>UserID</th>
         <th>Name</th>
+        <th>Amount</th>
+        <th>Plan</th>
         <th>Email</th>
-        <th>Service Rating</th>
-        <th>Website Rating</th>
-        <th>Additional Feedback</th>
-        <th>Date Created</th>
-        <th>Status</th>
+
         <th></th>
         <th></th>
       </tr>
@@ -67,18 +67,16 @@
     <tbody>
       {% for feedback in loan_list %}
         <tr>
-           <td>{{ feedback.get_name() }}</td>
-          <td>{{ feedback.get_email() }}</td>
-          <td>{{feedback.get_service()}}</td>
-          <td>{{feedback.get_website()}}</td>
-            <td>{{feedback.get_additional()}}</td>
-          <td>{{feedback.get_date()}}</td>
-          <td>{{feedback.get_status()}}</td>
-           <td><a href="/updateFeedback/{{feedback.get_email()}}" class="btn btn-warning">Update</a></td>
+           <td>{{ feedback.get_loan_id() }}</td>
+          <td>{{ feedback.get_loan_name() }}</td>
+          <td>{{feedback.get_loan_amount()}}</td>
+          <td>{{feedback.get_loan_plan()}}</td>
+            <td>{{feedback.get_loan_email()}}</td>
+           <td><a href="/updateLoan/{{int:id}}" class="btn btn-warning">Update</a></td>
           <td>
-            <form action="{{url_for('delete_feedback', id=feedback.get_email())}}" method="POST">
+            <form action="{{url_for('delete_feedback', id=feedback.get_loan_id())}}" method="POST">
 
-          <form type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#myModal_{{feedback.get_email()}}">
+          <form type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#myModal_{{feedback.get_loan_id()}}">
             <input type="submit" value="Delete" class="btn btn-danger">
           </form>
 
@@ -92,7 +90,7 @@
     </tbody>
   </table>
 </div>
-
+<!--
 <h2>Money Exchange</h2>
 <div>
   <table class="table table-striped">
@@ -128,7 +126,7 @@
             <input type="submit" value="Delete" class="btn btn-danger">
           </form>
 
-          <!-- The Modal -->
+
 
             </form>
           </td>
@@ -138,4 +136,5 @@
     </tbody>
   </table>
 </div>
+-->
 {% endblock %}
