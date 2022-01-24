@@ -1,5 +1,6 @@
 from wtforms import Form, StringField, validators, PasswordField, SelectField, ValidationError, TextAreaField
 from wtforms.fields import EmailField, DateField, FileField, IntegerField, RadioField, SearchField
+from flask_wtf.recaptcha import RecaptchaField
 
 
 class LoginForm(Form):
@@ -34,6 +35,7 @@ class UpdateCustomerForm(Form):
     phone = StringField('Phone', [validators.Length(min=8, max=8), validators.DataRequired()])
     birthdate = DateField('Birthdate', format='%Y-%m-%d')
     email = EmailField('Email', [validators.Email(), validators.DataRequired()])
+    recaptcha = RecaptchaField()
 
     def validate_phone(self, phone):
         if not phone.data[1:8].isdigit():
