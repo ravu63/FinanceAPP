@@ -34,6 +34,9 @@ def dashboard():
     return render_template('dashboard.html')
 
 #Joshua
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('error404.html'), 404
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     login_form = LoginForm(request.form)
