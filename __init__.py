@@ -784,10 +784,12 @@ def delete_loan(id):
 
 
 #Start of Ravu
+
+
 @app.route('/SUIshower', methods=['GET', 'POST'])
 def SUI_Shower():
     pawns_dict = {}
-    db = shelve.open('pawn.db', 'c')
+    db = shelve.open('pawn1.db', 'c')
     pawns_dict = db['Pawns']
     db.close()
 
@@ -804,16 +806,16 @@ def createPawn():
     create_pawn_form = PawnCreation(request.form)
     if request.method == 'POST' and create_pawn_form.validate():
         pawns_dict = {}
-        db = shelve.open('pawn.db', flag='c')
+        db = shelve.open('pawn1.db', 'c')
         sample_string = 'abcdefpqrstuvwxy'  # define the specific string
         # define the condition for random string
         SUI = ''.join((random.choice(sample_string)) for x in range(6))
         try:
             pawns_dict = db['Pawns']
         except:
-            print("Error in retrieving Users from pawn.db.")
+            print("Error in retrieving Users from pawn1.db.")
         pawn = Pawn_Creation(create_pawn_form.first_name.data, create_pawn_form.last_name.data, create_pawn_form.nric.data, create_pawn_form.contactnumber.data, create_pawn_form.email.data, create_pawn_form.address.data, create_pawn_form.itemname.data, create_pawn_form.Descriptionofitem.data, create_pawn_form.Category.data,
-                             create_pawn_form.ItemCondition.data, create_pawn_form.offer_price.data, create_pawn_form.pawn_period.data, SUI, 'Processing', create_pawn_form.pawn_image.data)
+                             create_pawn_form.ItemCondition.data, create_pawn_form.offer_price.data, create_pawn_form.pawn_period.data, SUI, 'Processing')
         pawns_dict[pawn.get_item_id()] = pawn
         db['Pawns'] = pawns_dict
 
@@ -825,7 +827,7 @@ def createPawn():
 @app.route('/retrievePawn')
 def retrieve_pawn():
     pawns_dict = {}
-    db = shelve.open('pawn.db', 'c')
+    db = shelve.open('pawn1.db', 'c')
     pawns_dict = db['Pawns']
     db.close()
 
@@ -840,7 +842,7 @@ def retrieve_pawn():
 @app.route('/deletepawn/<int:id>', methods=['POST'])
 def delete_pawn(id):
     pawns_dict = {}
-    db = shelve.open('pawn.db', 'w')
+    db = shelve.open('pawn1.db', 'w')
     pawns_dict = db['Pawns']
     if id in pawns_dict:
         pawns_dict.pop(id)
@@ -853,7 +855,7 @@ def delete_pawn(id):
 @app.route('/viewpawn/<int:id>', methods=['GET', 'POST'])
 def view_pawn(id):
     pawn_dict = {}
-    db = shelve.open('pawn.db', 'w')
+    db = shelve.open('pawn1.db', 'w')
     pawns_dict = db['Pawns']
 
     db['Pawns'] = pawns_dict
@@ -871,7 +873,7 @@ def update_pawn(id):
     update_pawn_form = PawnStatus(request.form)
     if request.method == 'POST' and update_pawn_form.validate():
         pawns_dict = {}
-        db = shelve.open('pawn.db', 'c')
+        db = shelve.open('pawn1.db', 'c')
         pawns_dict = db['Pawns']
         if id in pawns_dict:
             pawn = pawns_dict.get(id)
@@ -894,7 +896,7 @@ def update_pawn(id):
 
     else:
         pawns_dict = {}
-        db = shelve.open('pawn.db', 'r')
+        db = shelve.open('pawn1.db', 'r')
         if id in pawns_dict:
             pawn = pawns_dict.get(id)
             update_pawn_form.pawn_status.data = pawn.get_status()
@@ -911,7 +913,7 @@ def retrieve_status():
     if request.method == 'POST' and retrieve_status_form.validate():
         f_search = retrieve_status_form.SUI_CODE.data
         pawns_dict = {}
-        db = shelve.open('pawn.db', 'r')
+        db = shelve.open('pawn1.db', 'r')
         pawns_dict = db['Pawns']
         db.close()
         search = str(f_search)
@@ -939,7 +941,7 @@ def search_sui():
     if request.method == 'POST' and search_status_form.validate():
         f_search = search_status_form.SUI_CODE.data
         pawns_dict = {}
-        db = shelve.open('pawn.db', 'r')
+        db = shelve.open('pawn1.db', 'r')
         pawns_dict = db['Pawns']
         db.close()
         search = str(f_search)
@@ -967,7 +969,7 @@ def filter_status():
     if request.method == 'POST' and filter_status_form.validate():
         f_search = filter_status_form.pawn_status.data
         pawns_dict = {}
-        db = shelve.open('pawn.db', 'r')
+        db = shelve.open('pawn1.db', 'r')
         pawns_dict = db['Pawns']
         db.close()
         search = str(f_search)
@@ -987,6 +989,7 @@ def filter_status():
             return render_template("noSUI.html")
 
     return render_template('filterStatus.html', form=filter_status_form)
+
 #End of Ravu
 
 if __name__ == '__main__':

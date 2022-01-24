@@ -1,7 +1,6 @@
 from wtforms import Form, StringField, validators, PasswordField, SelectField, ValidationError, TextAreaField
 from wtforms.fields import EmailField, DateField, FileField, IntegerField, RadioField, SearchField
-import flask_wtf.file
-from flask_wtf.recaptcha import RecaptchaField
+
 
 
 class LoginForm(Form):
@@ -105,8 +104,8 @@ class CreatePlanForm(Form):
     Plan_name = StringField('Plan Name', [validators.Length(min=1, max=150), validators.DataRequired()])
     Plan_Des = StringField('Plan Description', [validators.Length(min=1, max=300), validators.DataRequired()])
     Plan_interest = IntegerField('Interest', [validators.NumberRange(min=1, max=100), validators.DataRequired()])
-    Plan_image = FileField('Profile', validators=[flask_wtf.file.FileRequired(),
-                                                  flask_wtf.file.FileAllowed(['jpg', 'png'], 'Images only!')])
+    #Plan_image = FileField('Profile', validators=[flask_wtf.file.FileRequired(),
+                                                  #flask_wtf.file.FileAllowed(['jpg', 'png'], 'Images only!')])
 
 
 class SearchLoanForm(Form):
@@ -119,7 +118,7 @@ class PawnCreation(Form):
     first_name = StringField('First Name', [validators.Length(min=1, max=150), validators.DataRequired()])
     last_name = StringField('Last Name', [validators.Length(min=1, max=150), validators.DataRequired()])
     nric = StringField('NRIC', [validators.Length(min=9, max=9), validators.DataRequired()])
-    contactnumber = StringField('Contact Number', [validators.Length(min=1, max=150), validators.DataRequired()])
+    contactnumber = StringField('Contact Number', [validators.Length(min=8, max=8), validators.DataRequired()])
     email = EmailField('Email', [validators.Email(), validators.DataRequired()])
     address = TextAreaField('Mailing Address', [validators.length(max=200), validators.DataRequired()])
     itemname = StringField('Name of Item', [validators.Length(min=1, max=150), validators.DataRequired()])
@@ -135,6 +134,17 @@ class PawnCreation(Form):
     offer_price = StringField('Offer Price', [validators.Length(min=1, max=150), validators.DataRequired()])
     pawn_period = StringField('Pawn Period(Month)', [validators.Length(min=1, max=150), validators.DataRequired()])
 
+    def validate_nric(form,nric):
+        if not nric.data[0].isalpha():
+            raise ValidationError("IC must start with S or T")
+        if not nric.data[1:7].isdigit():
+            raise ValidationError("IC needs to have 7 digits in between 2 letters")
+        if not nric.data[-1].isalpha():
+            raise ValidationError("IC must end with an alphabet")
+    def validate_contactnumber(form,contactnumber):
+        if not contactnumber.data.isdigit():
+            raise ValidationError("Your number should be in digits")
+
 
 
 class PawnStatus(Form):
@@ -149,7 +159,7 @@ class SearchSUI(Form):
      SUI_CODE = StringField('Enter in the SUI:', [validators.Length(min=1, max=9), validators.DataRequired()])
 
 class filterStatus(Form):
-    pawn_status = SelectField('Filter by Status:', [validators.DataRequired()],choices=[('Processing', 'Processing'), ('Picked Up', 'Picked Up'), ('Delivered', 'Delivered'),
+    pawn_status = SelectField('Filter by Status:', [validators.DataRequired()],choices=[('','Select'),('Processing', 'Processing'), ('Picked Up', 'Picked Up'), ('Delivered', 'Delivered'),
                                     ('Inspection', 'Inspection'), ('Offer Accepted', 'Offer Accepted'),
                                     ('Rejected', 'Rejected'), ('Successful', 'Successful')], default='')
 
