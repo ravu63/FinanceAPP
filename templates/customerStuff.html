@@ -57,7 +57,6 @@
         <th>UserID</th>
         <th>Name</th>
         <th>Amount</th>
-        <th>Plan</th>
         <th>Email</th>
 
         <th></th>
@@ -70,7 +69,6 @@
            <td>{{ feedback.get_loan_id() }}</td>
           <td>{{ feedback.get_loan_name() }}</td>
           <td>{{feedback.get_loan_amount()}}</td>
-          <td>{{feedback.get_loan_plan()}}</td>
             <td>{{feedback.get_loan_email()}}</td>
            <td><a href="/updateLoan/{{feedback.get_loan_id()}}" class="btn btn-warning">Update</a></td>
           <td>
