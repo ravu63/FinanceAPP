@@ -628,6 +628,63 @@ def show_customer():
     return render_template('showCustomer.html')
 
 
+@app.route('/customerStuff',methods=['GET','POST'])
+def customer_stuff():
+    search_customer_form=SearchCustomerForm(request.form)
+    if request.method=='POST'and search_customer_form.validate():
+        searchCustomer=search_customer_form.searchCustomer.data
+        transaction_dict={}
+        trans=shelve.open('transactions.db','r')
+        transaction_dict=trans['Transaction']
+        trans.close()
+
+        transaction_list=[]
+        for key in transaction_dict:
+            transaction=transaction_dict.get(key)
+            if transaction.get_email()==searchCustomer:
+                transaction_list.append(transaction)
+            else:
+                continue
+
+
+        loan_dict = {}
+        loan = shelve.open('signup.db', 'r')
+        loan_dict = loan['Loan']
+        loan.close()
+
+        loan_list = []
+        for key in loan_dict:
+            loan = loan_dict.get(key)
+            if loan.get_email() == searchCustomer:
+                loan_list.append(loan)
+            else:
+                continue
+
+
+        pawn_dict ={}
+        pawn = shelve.open('feedback.db', 'r')
+        pawn_dict = pawn['Pawns']
+        pawn.close()
+
+        pawn_list = []
+        for key in pawn_dict:
+            pawn = pawn_dict.get(key)
+            if pawn.get_email() == searchCustomer:
+                pawn_list.append(transaction)
+            else:
+                continue
+
+        if len(transaction_list)>0:
+            return render_template("customerStuff.html",count=len(transaction_list), transaction_list=transaction_list, loan_list=loan_list, pawn_list=pawn_list)
+        elif len(loan_list)>0:
+            return render_template("customerStuff.html", count=len(loan_list), transaction_list=transaction_list,loan_list=loan_list, pawn_list=pawn_list)
+        elif len(pawn_list)>0:
+            return render_template("customerStuff.html", count=len(pawn_list), transaction_list=transaction_list,loan_list=loan_list, pawn_list=pawn_list)
+        else:
+            return redirect(url_for('no_customer'))
+    return render_template('searchStuff.html',form=search_customer_form)
+
+
 # Joshua
 
 # APP ROUTES FOR LOAN CREATE/RETRIEVE/UPDATE/DELETE
