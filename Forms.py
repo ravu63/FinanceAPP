@@ -110,3 +110,44 @@ class SearchLoanForm(Form):
     Loan_search = SearchField('Enter Loan Id', [validators.Length(min=1, max=7), validators.DataRequired])
 
 # END OF LOAN FORMS
+
+# Start of Ravu Froms
+class PawnCreation(Form):
+    first_name = StringField('First Name', [validators.Length(min=1, max=150), validators.DataRequired()])
+    last_name = StringField('Last Name', [validators.Length(min=1, max=150), validators.DataRequired()])
+    nric = StringField('NRIC', [validators.Length(min=9, max=9), validators.DataRequired()])
+    contactnumber = StringField('Contact Number', [validators.Length(min=1, max=150), validators.DataRequired()])
+    email = EmailField('Email', [validators.Email(), validators.DataRequired()])
+    address = TextAreaField('Mailing Address', [validators.length(max=200), validators.DataRequired()])
+    itemname = StringField('Name of Item', [validators.Length(min=1, max=150), validators.DataRequired()])
+    Descriptionofitem = TextAreaField('Description of Item', [validators.length(max=200), validators.DataRequired()])
+    Category = SelectField('Category', [validators.DataRequired()],
+                           choices=[('', 'Select'), ('Jewelry', 'Jewelry'), ('Electronics', 'Electronics'),
+                                    ('Musical Instruments', 'Musical Instruments'), ('Watch', 'Watch'),
+                                    ('Antiques', 'Antiques'), ('Others', 'Others')], default='')
+    ItemCondition = SelectField('ItemCondition', [validators.DataRequired()],
+                                choices=[('', 'Select'), ('Heavily Used', 'Heavily Used'),
+                                         ('Lightly Used', 'Lightly Used'),
+                                         ('Like New', 'Like New'), ('New', 'New')], default='')
+    offer_price = StringField('Offer Price', [validators.Length(min=1, max=150), validators.DataRequired()])
+    pawn_period = StringField('Pawn Period(Month)', [validators.Length(min=1, max=150), validators.DataRequired()])
+
+
+
+class PawnStatus(Form):
+    pawn_status = SelectField('Pawn Status', [validators.DataRequired()],choices=[('Processing', 'Processing'), ('Picked Up', 'Picked Up'), ('Delivered', 'Delivered'),
+                                    ('Inspection', 'Inspection'), ('Offer Accepted', 'Offer Accepted'),
+                                    ('Rejected', 'Rejected'), ('Successful', 'Successful')], default='Processing')
+
+class PawnRetrieval(Form):
+    SUI_CODE = StringField('Enter in the SUI:', [validators.Length(min=1, max=9), validators.DataRequired()])
+
+class SearchSUI(Form):
+     SUI_CODE = StringField('Enter in the SUI:', [validators.Length(min=1, max=9), validators.DataRequired()])
+
+class filterStatus(Form):
+    pawn_status = SelectField('Filter by Status:', [validators.DataRequired()],choices=[('Processing', 'Processing'), ('Picked Up', 'Picked Up'), ('Delivered', 'Delivered'),
+                                    ('Inspection', 'Inspection'), ('Offer Accepted', 'Offer Accepted'),
+                                    ('Rejected', 'Rejected'), ('Successful', 'Successful')], default='')
+
+#End of Ravu
