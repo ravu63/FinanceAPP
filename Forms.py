@@ -98,6 +98,19 @@ class CreateLoanForm(Form):
     last_name = StringField('Last Name', [validators.Length(min=1, max=150), validators.DataRequired()])
     Amount = IntegerField('Amount $', [validators.NumberRange(min=1, max=999999), validators.DataRequired()])
     email = EmailField('Email address', [validators.DataRequired(), validators.Email()])
+    
+    def validate_amount(self, Amount):
+        if Amount.data > 9999:
+            raise ValidationError("Amount must not exceed 999999 SGD")
+        if Amount.data is not int():
+            raise ValidationError("Amount must not contain Letters")
+
+    def validate_email(self, email):
+        """Ensure no duplicate emails."""
+        user = User.query.filter_by(email=email.data).first()
+        if user is not None:
+            raise ValidationError('Please use a different email address.')
+
 
 
 class CreatePlanForm(Form):

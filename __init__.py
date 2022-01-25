@@ -1,5 +1,4 @@
-from currency_converter import CurrencyConverter
-
+#from currency_converter import CurrencyConverter
 import Admin
 import Customer
 import Feedback
@@ -17,9 +16,8 @@ from Forms import CreateCustomerForm, LoginForm, UpdateCustomerForm, UpdateCusto
     ChangePassword, FeedbackForm, SearchCustomerForm, UpdateStatus, CreateLoanForm, CreatePlanForm, PawnCreation, \
     PawnStatus, \
     PawnRetrieval, SearchSUI, filterStatus
-from currency import Currency
 from transaction import Transaction, CustomerPurchase
-
+#from currency import Currency
 app = Flask(__name__)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587

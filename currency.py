@@ -1,4 +1,3 @@
-
 class Currency:
     def __init__(self, amount, initial, to, *args):
         super().__init__(*args)
