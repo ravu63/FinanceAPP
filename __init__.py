@@ -6,6 +6,7 @@ import Feedback
 import Loan
 import random
 import shelve
+import Plan
 from PawnCreation import Pawn_Creation
 from PawnStatus import Pawn_Status
 from datetime import date
@@ -13,7 +14,9 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from flask_mail import Mail, Message
 
 from Forms import CreateCustomerForm, LoginForm, UpdateCustomerForm, UpdateCustomerForm2, ForgetPassword, OTPform, \
-    ChangePassword, FeedbackForm, SearchCustomerForm, UpdateStatus, CreateLoanForm,PawnCreation, PawnStatus, PawnRetrieval, SearchSUI, filterStatus
+    ChangePassword, FeedbackForm, SearchCustomerForm, UpdateStatus, CreateLoanForm, CreatePlanForm, PawnCreation, \
+    PawnStatus, \
+    PawnRetrieval, SearchSUI, filterStatus
 from currency import Currency
 from transaction import Transaction, CustomerPurchase
 
@@ -692,7 +695,17 @@ def customer_stuff():
 # APP ROUTES FOR LOAN CREATE/RETRIEVE/UPDATE/DELETE
 @app.route('/Loan.html')
 def loans():
-    return render_template('Loan.html')
+    plans_dict = {}
+    db = shelve.open('Plans.db', 'r')
+    plans_dict = db['Plans']
+    db.close()
+
+    plans_list = []
+    for key in plans_dict:
+        plan = plans_dict.get(key)
+        plans_list.append(plan)
+
+    return render_template('Loan.html',count=len(plans_list), plans_lists=plans_list)
 
 
 @app.route('/createLoan.html', methods=['GET', 'POST'])
@@ -709,8 +722,8 @@ def create_loan():
         loanentry = Loan.Loan(create_loan_form.first_name.data,
                               create_loan_form.last_name.data,
                               create_loan_form.Amount.data,
-                              create_loan_form.Plan.data,
-                              create_loan_form.email.data)
+                              create_loan_form.email.data,
+                              )
         loans_dict[loanentry.get_loan_id()] = loanentry
         db['Loans'] = loans_dict
         db.close()
@@ -735,7 +748,7 @@ def retrieve_loans():
 
 
 @app.route('/updateLoan.html/<int:id>/', methods=['GET', 'POST'])
-def update_Loan(id):
+def update_loan(id):
     update_loan_form = CreateLoanForm(request.form)
     if request.method == 'POST' and update_loan_form.validate():
         loans_dict = {}
@@ -746,7 +759,6 @@ def update_Loan(id):
         loan.set_loan_name1(update_loan_form.first_name.data)
         loan.set_loan_name2(update_loan_form.last_name.data)
         loan.set_loan_amount(update_loan_form.Amount.data)
-        loan.set_loan_plan(update_loan_form.Plan.data)
         loan.set_loan_email(update_loan_form.email.data)
 
         db['Loans'] = loans_dict
@@ -763,7 +775,6 @@ def update_Loan(id):
         update_loan_form.first_name.data = loan.get_loan_first()
         update_loan_form.last_name.data = loan.get_loan_last()
         update_loan_form.Amount.data = loan.get_loan_amount()
-        update_loan_form.Plan.data = loan.get_loan_plan()
 
         return render_template('updateLoan.html', form=update_loan_form)
 
@@ -781,6 +792,116 @@ def delete_loan(id):
 
     return redirect(url_for('retrieve_Loans'))
 
+
+@app.route('/createPlan.html', methods=['GET', 'POST'])
+def create_plan():
+    create_plan_form = CreatePlanForm(request.form)
+    if request.method == 'POST' and create_plan_form.validate():
+        plans_dict = {}
+        db = shelve.open('Plans.db', 'c')
+        print("User successfully saved")
+        try:
+            plans_dict = db['Plans']
+        except:
+            print("Error in retrieving Users from Plans.db.")
+        planentry = Plan.Plan(create_plan_form.Plan_name.data,
+                              create_plan_form.Plan_Des.data,
+                              create_plan_form.Plan_interest.data,)
+        plans_dict[planentry.get_loan_plan_id()] = planentry
+        db['Plans'] = plans_dict
+        db.close()
+        print("Plan saved with {0} as Plan Id".format(planentry.get_loan_plan_id()))
+        flash('Document uploaded successfully.')
+
+        return redirect(url_for('retrieve_plan'))
+
+    return render_template('createPlan.html', form=create_plan_form)
+
+
+@app.route('/retrievePlan.html')
+def retrieve_plan():
+    plans_dict = {}
+    db = shelve.open('Plans.db', 'r')
+    plans_dict = db['Plans']
+    db.close()
+
+    plans_list = []
+    for key in plans_dict:
+        plan = plans_dict.get(key)
+        plans_list.append(plan)
+
+    return render_template('retrievePlan.html', count=len(plans_list), plans_lists=plans_list)
+
+
+@app.route('/updatePlan.html/<int:id>/', methods=['GET', 'POST'])
+def update_plan(id):
+    update_plan_form = CreatePlanForm(request.form)
+    if request.method == 'POST' and update_plan_form.validate():
+        plans_dict = {}
+        db = shelve.open('Plans.db', 'w')
+        plans_dict = db['Plans']
+
+        plan = plans_dict.get(id)
+        plan.set_loan_plan_name(update_plan_form.Plan_name.data)
+        plan.set_loan_plan_desc(update_plan_form.Plan_Des.data)
+        plan.set_loan_plan_int(update_plan_form.Plan_interest.data)
+
+        db['Plans'] = plans_dict
+        db.close()
+
+        return redirect(url_for('retrieve_plan'))
+    else:
+        plans_dict = {}
+        db = shelve.open('Plans.db', 'r')
+        plans_dict = db['Plans']
+        db.close()
+
+        plan = plans_dict.get(id)
+        update_plan_form.Plan_name.data = plan.get_loan_plan_name()
+        update_plan_form.Plan_Des.data = plan.get_loan_plan_desc()
+        update_plan_form.Plan_interest.data = plan.get_loan_plan_int()
+
+        return render_template('updatePlan.html', form=update_plan_form)
+
+
+@app.route('/deletePlan/<int:id>', methods=['POST'])
+def delete_plan(id):
+    plans_dict = {}
+    db = shelve.open('Plans.db', 'w')
+    plans_dict = db['Plans']
+
+    plans_dict.pop(id)
+
+    db['Plans'] = plans_dict
+    db.close()
+
+    return redirect(url_for('retrieve_plan'))
+
+
+# @app.route('/searchLoan.html', methods=['GET','POST'])
+# def search_loan():
+#     search_loan_form = SearchLoanForm(request.form)
+#     if request.method == 'POST' and search_loan_form.validate_on_submit():
+#         search = search_loan_form.Loan_search.data
+#         loans_dict = {}
+#         db = shelve.open('Loan.db', 'r')
+#         loans_dict = db["Loans"]
+#         db.close()
+#
+#         loans_list = []
+#         for key in loans_dict:
+#             loan = loans_dict.get(key)
+#
+#             if Loan.get_loan_UEN() == search:
+#                 loans_list.append(loan)
+#             else:
+#                 continue
+#
+#         if len(loans_list) !=0:
+#             return render_template('showLoan.html', count=len(loans_list), loans_list=loans_list)
+#
+#
+#     return render_template('search.html', form=SearchLoanForm)
 
 # END OF LOAN INIT
 
