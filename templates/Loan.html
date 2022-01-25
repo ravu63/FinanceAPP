@@ -4,35 +4,14 @@
 {% block content %}
     <!-- START OF STYLE SHEET-->
     <style>
-       th, td {
-         vertical-align: top;
-      }
-
-      h1, p {
-        align-item:center;
-        text-align: center;
-      }
-
-       .output {
-          font-weight: bold;
-      }
-
-      .card{
-        border: solid black 1px;
-        display: inline-block;
-        align-items: center;
-        min-height: 100%;
-        min-width: 100%;
-
-      }
-      .disclaimer_text_loans {
-        font-size: 65%;
-      }
-
-       #loan_table_plan {
-        margin-left:10%;
-        margin-right:10%;
-      }
+       .row {
+          text-align: center;
+          display: inline-block;
+          margin: auto;
+          width: 60%;
+          border: 5px solid #FFFF00;
+          padding: 10px;
+       }
 
        #payment {
           text-decoration: underline;
@@ -55,27 +34,22 @@
     </style>
     <!-- END OF STYLE SHEET-->
 
-    <table id="loan_table_plan">
-      <tr class="loan_introtext">
-        <td colspan='4'><h1>Select a Loan Plan</h1></td>
-      </tr>
-      <tr class="loan_introtext">
-        <td colspan='4'><p>Enjoy greater value with our Loan plans that offer great flexibility and low interest rates. <br>Because Radiant Finance ensurses theres a radiant solution for your darkest times</p></td>
-      </tr>
-      <tr>
-        <!-- Plan no.1 -->
-        <td>
-        <div class="card">
-          <img src="Plan_image.jpg" alt="Plan-Images" style="width:100%">
-          <h1>Sliver loan plan</h1>
-          <p class="price">3% Interest rate</p>
-          <p>This plan offers a 3% interest rate with flexible monthly payments <br>that can stretch up to 8 years* </p>
-          <p class="disclaimer_text_loans"> **Based on loan amount</p>
-            <p><a href="/createLoan.html" class="loan_plan_buttons">Choose this plan</a></p>
-        </div>
-        </td>
-      </tr>
-    </table>
+        {% for plan in plans_lists %}
+            <div class="row" style="border:solid;max-width:250px;width:100%;">
+                <div class="two columns">
+                    <h1 id="{{ plan.get_loan_plan_id }}" class="year-text">{{ plan.get_loan_plan_name() }}</h1>
+                </div>
+                <div class="two columns">
+                    <p class="year-text">{{ plan.get_loan_plan_desc() }}</p>
+                </div>
+                <div class="two columns">
+                    <p class="year-text">{{ plan.get_loan_plan_int() }}% interest</p>
+                </div>
+                 <div class="six columns offset-by-five">
+                    <a href="/createLoan.html" class="btn btn-primary">Choose Plan</a>
+                </div>
+            </div>
+        {% endfor %}
 
     <hr>
 
