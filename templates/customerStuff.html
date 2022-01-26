@@ -3,7 +3,7 @@
 
 {% block content %}
 <h1 class="display-4">Customer stuff</h1>
-<!--
+
 <h2>Pawn</h2>
 <div>
   <table class="table table-striped">
@@ -11,10 +11,6 @@
       <tr>
         <th>Name</th>
         <th>Email</th>
-        <th>Service Rating</th>
-        <th>Website Rating</th>
-        <th>Additional Feedback</th>
-        <th>Date Created</th>
         <th>Status</th>
         <th></th>
         <th></th>
@@ -23,16 +19,12 @@
     <tbody>
       {% for feedback in pawn_list %}
         <tr>
-           <td>{{ feedback.get_name() }}</td>
+           <td>{{ feedback.get_firstname() }}</td>
           <td>{{ feedback.get_email() }}</td>
-          <td>{{feedback.get_service()}}</td>
-          <td>{{feedback.get_website()}}</td>
-            <td>{{feedback.get_additional()}}</td>
-          <td>{{feedback.get_date()}}</td>
-          <td>{{feedback.get_status()}}</td>
-           <td><a href="/updateFeedback/{{feedback.get_email()}}" class="btn btn-warning">Update</a></td>
+          <td>{{feedback.get_pawnstatus()}}</td>
+           <td><a href="/updatePawn/{{feedback.get_}}" class="btn btn-warning">Update</a></td>
           <td>
-            <form action="{{url_for('delete_feedback', id=feedback.get_email())}}" method="POST">
+            <form action="{{url_for('delete_pawn', id=feedback.get_email())}}" method="POST">
 
           <form type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#myModal_{{feedback.get_email()}}">
             <input type="submit" value="Delete" class="btn btn-danger">
@@ -48,7 +40,7 @@
     </tbody>
   </table>
 </div>
--->
+
 <h2>Loan</h2>
 <div>
   <table class="table table-striped">
@@ -88,7 +80,7 @@
     </tbody>
   </table>
 </div>
-<!--
+<!---
 <h2>Money Exchange</h2>
 <div>
   <table class="table table-striped">
@@ -118,7 +110,7 @@
           <td>{{feedback.get_status()}}</td>
            <td><a href="/updateFeedback/{{feedback.get_email()}}" class="btn btn-warning">Update</a></td>
           <td>
-            <form action="{{url_for('delete_feedback', id=feedback.get_email())}}" method="POST">
+            <form action="{{url_for('transactionProcess', id=feedback.get_email())}}" method="POST">
 
           <form type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#myModal_{{feedback.get_email()}}">
             <input type="submit" value="Delete" class="btn btn-danger">
@@ -134,5 +126,5 @@
     </tbody>
   </table>
 </div>
--->
+--->
 {% endblock %}

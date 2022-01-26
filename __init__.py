@@ -635,19 +635,22 @@ def show_customer():
 def customer_stuff():
     search_customer_form=SearchCustomerForm(request.form)
     if request.method=='POST'and search_customer_form.validate():
+        number=[]
         searchCustomer=search_customer_form.searchCustomer.data
-        #transaction_dict={}
-        #trans=shelve.open('transactions.db','r')
-        #transaction_dict=trans['Transaction']
-        #trans.close()
+        # transaction_dict={}
+        # trans=shelve.open('transactions','r')
+        # transaction_dict=trans['Transaction']
+        # trans.close()
+        #
+        # transaction_list=[]
+        # for key in transaction_dict:
+        #     transaction=transaction_dict.get(key)
+        #     if transaction.get_email()==searchCustomer:
+        #         transaction_list.append(transaction)
+        #         number.append('1')
+        #     else:
+        #         continue
 
-        #transaction_list=[]
-        #for key in transaction_dict:
-         #   transaction=transaction_dict.get(key)
-          #  if transaction.get_email()==searchCustomer:
-           #     transaction_list.append(transaction)
-            #else:
-             #   continue
 
 
         loan_dict = {}
@@ -660,29 +663,27 @@ def customer_stuff():
             loan = loan_dict.get(key)
             if loan.get_loan_email() == searchCustomer:
                 loan_list.append(loan)
+                number.append('1')
             else:
                 continue
 
 
-       # pawn_dict ={}
-       # pawn = shelve.open('feedback.db', 'r')
-        #pawn_dict = pawn['Pawns']
-       # pawn.close()
+        pawn_dict ={}
+        pawn = shelve.open('pawn1.db', 'r')
+        pawn_dict = pawn['Pawns']
+        pawn.close()
 
-       # pawn_list = []
-        #for key in pawn_dict:
-          #  pawn = pawn_dict.get(key)
-           # if pawn.get_email() == searchCustomer:
-            #    pawn_list.append(transaction)
-           # else:
-             #   continue
+        pawn_list = []
+        for key in pawn_dict:
+            pawn = pawn_dict.get(key)
+            if pawn.get_email() == searchCustomer:
+                pawn_list.append(pawn)
+                number.append('1')
+            else:
+                continue
 
-       # if len(transaction_list)>0:
-            #return render_template("customerStuff.html",count=len(transaction_list), transaction_list=transaction_list, loan_list=loan_list, pawn_list=pawn_list)
-        if len(loan_list)>0:
-            return render_template("customerStuff.html", count=len(loan_list), loan_list=loan_list)
-       # elif len(pawn_list)>0:
-           # return render_template("customerStuff.html", count=len(pawn_list), transaction_list=transaction_list,loan_list=loan_list, pawn_list=pawn_list)
+        if len(number)>0:
+            return render_template("customerStuff.html", count=len(number), loan_list=loan_list,pawn_dict=pawn_dict)
         else:
             return redirect(url_for('no_customer'))
     return render_template('searchStuff.html',form=search_customer_form)
@@ -1117,166 +1118,166 @@ def filter_status():
 
 
 # ashton
-def getCurrencyArray():
-    c = CurrencyConverter()
-    currency = []
-    for a in c.currencies:
-        currency.append(a)
-    currency.sort()
-    return currency
-
-
-def convert(amt, first, second):
-    # converter item
-    c = CurrencyConverter()
-    final = round(c.convert(amt, first, second), 2)
-    rate = round(c.convert(1, first, second), 2)
-    return final, rate
-
-@app.route('/moneyExchange', methods=['GET'])
-def moneyExchangePage():
-    return render_template('moneyExchanger.html', countries=getCurrencyArray())
-
-@app.route('/moneyExchangeUpdate', methods=['GET'])
-def moneyExchangeUpdate():
-    transactions = shelve.open('transactions')
-    transList = list(transactions.keys())
-    trans = []
-    for id in transList:
-        trans.append(transactions[id])
-        print(transactions[id])
-    allTrans = list(transactions.keys())
-    transactions.close()
-    return render_template('update.html', transactions=allTrans, objects=trans)
-
-@app.route('/moneyExchangeDelete', methods=['GET'])
-def moneyExchangeDelete():
-    transactions = shelve.open('transactions')
-    transList = list(transactions.keys())
-    trans = []
-    for id in transList:
-        trans.append(transactions[id])
-        print(transactions[id])
-    allTrans = list(transactions.keys())
-    transactions.close()
-    return render_template('delete.html', transactions=allTrans, objects=trans)
-
-@app.route('/convertMoney', methods=['POST'])
-def moneyExchange():
-    final = 0
-    # reading of form input
-    if request.method == 'POST':
-        # currency object.
-        convertObject = Currency(request.form.get('amount'), request.form.get('from'), request.form.get('to'))
-        amt = convertObject.getAmount()
-        first = convertObject.getInitial()
-        second = convertObject.getTo()
-        result = convert(convertObject.getAmount(), convertObject.getInitial(), convertObject.getTo())
-        # pass the price from checkout page to complete checkout page
-        session['price'] = result
-        # initial currency
-        session['from'] = first
-        # converted to currency
-        session['to'] = second
-        print(second)
-        session['amount'] = amt
-        if 'convert' in request.form:
-            # return result
-            return render_template('moneyExchanger.html', amt=amt, result=result[0], first=first, second=second,
-                                   rate=result[1], countries=getCurrencyArray())
-
-        elif 'checkout' in request.form:
-            return render_template('checkout.html', amt=amt, result=result[0], first=first, second=second,
-                                   rate=result[1], cost=session['price'], initial=session['from'], after=session['to'], amount=session['amount'])
-
-        elif 'delete' in request.form:
-            transactions = shelve.open('transactions')
-            allTrans = list(transactions.keys())
-            return render_template('delete.html', transactions = allTrans)
-
-        elif 'update' in request.form:
-            transactions = shelve.open('transactions')
-            transList = list(transactions.keys())
-            trans = []
-            for id in transList:
-                trans.append(transactions[id])
-                print(transactions[id])
-            allTrans = list(transactions.keys())
-            transactions.close()
-            return render_template('update.html', transactions = allTrans, objects=trans)
-
-
-@app.route('/completeCheckout', methods=['POST'])
-def finishCheckout():
-    price = session.get('price')
-    initial = session.get('from')
-    to = session.get('to')
-    amt = session.get('amount')
-    transactions = shelve.open('transactions')
-    print(len(transactions))
-    # transaction id is incremented based off the length of transactions shelve
-
-    customerPaid = CustomerPurchase(request.form.get('firstname'), request.form.get('email'), request.form.get('address'),
-                              request.form.get('city'), request.form.get('state'), request.form.get('zip'),
-                                    amount=amt, initial=initial, to=to, price=price[0], transactionID=(len(transactions) + 1))
-
-    # we set the key to the transaction id: "1" : <object> and so on
-    transactions[str(len(transactions) + 1)] = customerPaid
-
-    transactions.close()
-
-    return render_template('finishCheckout.html', message = customerPaid)
-
-
-@app.route('/deleteTransaction', methods=['POST'])
-def transactionProcess():
-    transactions = shelve.open('transactions', flag='c')
-    transList = list(transactions.keys())
-
-    if 'check' in request.form:
-        return render_template('delete.html', details=transactions[request.form.get('tId')], transactions=transList)
-
-    elif 'delete' in request.form:
-        id = request.form.get('tId')
-        del transactions[id]
-        return render_template('delete.html', deleted=id, transactions=transList)
-
-# for now there is only name update, but there can be more added
-@app.route('/updateTransaction', methods=['POST'])
-def updateTrans():
-    name = request.form.get('newName')
-    name = str(name)
-    id = request.form.get('tId')
-
-    if 'update' in request.form:
-        print(name)
-        # check if the name is a string
-        if name.isalpha():
-            print("went here")
-            transactions = shelve.open('transactions', writeback=True)
-            object = transactions[id]
-            object.setName(name)
-            transList = list(transactions.keys())
-            print(object)
-            transactions.close()
-            return render_template('update.html', details=object, transactions=transList)
-
-        # update if it is
-        else:
-            print("went here2")
-            transactions = shelve.open('transactions', writeback=True)
-            transList = list(transactions.keys())
-            transactions.close()
-            return render_template('update.html', error="Name is not valid.", transactions=transList)
-
-    elif 'check' in request.form:
-        transactions = shelve.open('transactions', writeback=True)
-        transList = list(transactions.keys())
-        object = transactions[id]
-        print(object)
-        transactions.close()
-        return render_template('update.html', check=object, transactions=transList)
-
+# def getCurrencyArray():
+#     c = CurrencyConverter()
+#     currency = []
+#     for a in c.currencies:
+#         currency.append(a)
+#     currency.sort()
+#     return currency
+#
+#
+# def convert(amt, first, second):
+#     # converter item
+#     c = CurrencyConverter()
+#     final = round(c.convert(amt, first, second), 2)
+#     rate = round(c.convert(1, first, second), 2)
+#     return final, rate
+#
+# @app.route('/moneyExchange', methods=['GET'])
+# def moneyExchangePage():
+#     return render_template('moneyExchanger.html', countries=getCurrencyArray())
+#
+# @app.route('/moneyExchangeUpdate', methods=['GET'])
+# def moneyExchangeUpdate():
+#     transactions = shelve.open('transactions')
+#     transList = list(transactions.keys())
+#     trans = []
+#     for id in transList:
+#         trans.append(transactions[id])
+#         print(transactions[id])
+#     allTrans = list(transactions.keys())
+#     transactions.close()
+#     return render_template('update.html', transactions=allTrans, objects=trans)
+#
+# @app.route('/moneyExchangeDelete', methods=['GET'])
+# def moneyExchangeDelete():
+#     transactions = shelve.open('transactions')
+#     transList = list(transactions.keys())
+#     trans = []
+#     for id in transList:
+#         trans.append(transactions[id])
+#         print(transactions[id])
+#     allTrans = list(transactions.keys())
+#     transactions.close()
+#     return render_template('delete.html', transactions=allTrans, objects=trans)
+#
+# @app.route('/convertMoney', methods=['POST'])
+# def moneyExchange():
+#     final = 0
+#     # reading of form input
+#     if request.method == 'POST':
+#         # currency object.
+#         convertObject = Currency(request.form.get('amount'), request.form.get('from'), request.form.get('to'))
+#         amt = convertObject.getAmount()
+#         first = convertObject.getInitial()
+#         second = convertObject.getTo()
+#         result = convert(convertObject.getAmount(), convertObject.getInitial(), convertObject.getTo())
+#         # pass the price from checkout page to complete checkout page
+#         session['price'] = result
+#         # initial currency
+#         session['from'] = first
+#         # converted to currency
+#         session['to'] = second
+#         print(second)
+#         session['amount'] = amt
+#         if 'convert' in request.form:
+#             # return result
+#             return render_template('moneyExchanger.html', amt=amt, result=result[0], first=first, second=second,
+#                                    rate=result[1], countries=getCurrencyArray())
+#
+#         elif 'checkout' in request.form:
+#             return render_template('checkout.html', amt=amt, result=result[0], first=first, second=second,
+#                                    rate=result[1], cost=session['price'], initial=session['from'], after=session['to'], amount=session['amount'])
+#
+#         elif 'delete' in request.form:
+#             transactions = shelve.open('transactions')
+#             allTrans = list(transactions.keys())
+#             return render_template('delete.html', transactions = allTrans)
+#
+#         elif 'update' in request.form:
+#             transactions = shelve.open('transactions')
+#             transList = list(transactions.keys())
+#             trans = []
+#             for id in transList:
+#                 trans.append(transactions[id])
+#                 print(transactions[id])
+#             allTrans = list(transactions.keys())
+#             transactions.close()
+#             return render_template('update.html', transactions = allTrans, objects=trans)
+#
+#
+# @app.route('/completeCheckout', methods=['POST'])
+# def finishCheckout():
+#     price = session.get('price')
+#     initial = session.get('from')
+#     to = session.get('to')
+#     amt = session.get('amount')
+#     transactions = shelve.open('transactions')
+#     print(len(transactions))
+#     # transaction id is incremented based off the length of transactions shelve
+#
+#     customerPaid = CustomerPurchase(request.form.get('firstname'), request.form.get('email'), request.form.get('address'),
+#                               request.form.get('city'), request.form.get('state'), request.form.get('zip'),
+#                                     amount=amt, initial=initial, to=to, price=price[0], transactionID=(len(transactions) + 1))
+#
+#     # we set the key to the transaction id: "1" : <object> and so on
+#     transactions[str(len(transactions) + 1)] = customerPaid
+#
+#     transactions.close()
+#
+#     return render_template('finishCheckout.html', message = customerPaid)
+#
+#
+# @app.route('/deleteTransaction', methods=['POST'])
+# def transactionProcess():
+#     transactions = shelve.open('transactions', flag='c')
+#     transList = list(transactions.keys())
+#
+#     if 'check' in request.form:
+#         return render_template('delete.html', details=transactions[request.form.get('tId')], transactions=transList)
+#
+#     elif 'delete' in request.form:
+#         id = request.form.get('tId')
+#         del transactions[id]
+#         return render_template('delete.html', deleted=id, transactions=transList)
+#
+# # for now there is only name update, but there can be more added
+# @app.route('/updateTransaction', methods=['POST'])
+# def updateTrans():
+#     name = request.form.get('newName')
+#     name = str(name)
+#     id = request.form.get('tId')
+#
+#     if 'update' in request.form:
+#         print(name)
+#         # check if the name is a string
+#         if name.isalpha():
+#             print("went here")
+#             transactions = shelve.open('transactions', writeback=True)
+#             object = transactions[id]
+#             object.setName(name)
+#             transList = list(transactions.keys())
+#             print(object)
+#             transactions.close()
+#             return render_template('update.html', details=object, transactions=transList)
+#
+#         # update if it is
+#         else:
+#             print("went here2")
+#             transactions = shelve.open('transactions', writeback=True)
+#             transList = list(transactions.keys())
+#             transactions.close()
+#             return render_template('update.html', error="Name is not valid.", transactions=transList)
+#
+#     elif 'check' in request.form:
+#         transactions = shelve.open('transactions', writeback=True)
+#         transList = list(transactions.keys())
+#         object = transactions[id]
+#         print(object)
+#         transactions.close()
+#         return render_template('update.html', check=object, transactions=transList)
+#
 
 
 
