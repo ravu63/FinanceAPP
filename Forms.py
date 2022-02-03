@@ -2,7 +2,6 @@ from wtforms import Form, StringField, validators, PasswordField, SelectField, V
 from wtforms.fields import EmailField, DateField, FileField, IntegerField, RadioField, SearchField
 
 
-
 class LoginForm(Form):
     email = EmailField('Email', [validators.Email(), validators.DataRequired()])
     password = PasswordField('Password', [validators.Length(min=10, max=150), validators.DataRequired()])
@@ -18,7 +17,6 @@ class CreateCustomerForm(Form):
     password = PasswordField('Password', [validators.Length(min=10, max=150), validators.DataRequired(),
                                           validators.EqualTo('confirmpassword', message='Error:Passwords must match')])
     confirmpassword = PasswordField('Confirm Password', [validators.DataRequired()])
-
 
     def validate_phone(self, phone):
         if not phone.data[1:8].isdigit():
@@ -36,7 +34,6 @@ class UpdateCustomerForm(Form):
     phone = StringField('Phone', [validators.Length(min=8, max=8), validators.DataRequired()])
     birthdate = DateField('Birthdate', format='%Y-%m-%d')
     email = EmailField('Email', [validators.Email(), validators.DataRequired()])
-
 
     def validate_phone(self, phone):
         if not phone.data[1:8].isdigit():
@@ -98,18 +95,12 @@ class CreateLoanForm(Form):
     last_name = StringField('Last Name', [validators.Length(min=1, max=150), validators.DataRequired()])
     Amount = IntegerField('Amount $', [validators.NumberRange(min=1, max=999999), validators.DataRequired()])
     email = EmailField('Email address', [validators.DataRequired(), validators.Email()])
-    
+
     def validate_amount(self, Amount):
         if Amount.data > 9999:
             raise ValidationError("Amount must not exceed 999999 SGD")
         if Amount.data is not int():
             raise ValidationError("Amount must not contain Letters")
-
-    def validate_email(self, email):
-        """Ensure no duplicate emails."""
-        user = User.query.filter_by(email=email.data).first()
-        if user is not None:
-            raise ValidationError('Please use a different email address.')
 
 
 
@@ -117,12 +108,13 @@ class CreatePlanForm(Form):
     Plan_name = StringField('Plan Name', [validators.Length(min=1, max=150), validators.DataRequired()])
     Plan_Des = StringField('Plan Description', [validators.Length(min=1, max=300), validators.DataRequired()])
     Plan_interest = IntegerField('Interest', [validators.NumberRange(min=1, max=100), validators.DataRequired()])
-    #Plan_image = FileField('Profile', validators=[flask_wtf.file.FileRequired(),
-                                                  #flask_wtf.file.FileAllowed(['jpg', 'png'], 'Images only!')])
+    # Plan_image = FileField('Profile', validators=[flask_wtf.file.FileRequired(),
+    # flask_wtf.file.FileAllowed(['jpg', 'png'], 'Images only!')])
 
 
 class SearchLoanForm(Form):
     Loan_search = SearchField('Enter Loan Id', [validators.Length(min=1, max=7), validators.DataRequired])
+
 
 # END OF LOAN FORMS
 
@@ -147,33 +139,40 @@ class PawnCreation(Form):
     offer_price = StringField('Offer Price', [validators.Length(min=1, max=150), validators.DataRequired()])
     pawn_period = StringField('Pawn Period(Month)', [validators.Length(min=1, max=150), validators.DataRequired()])
 
-    def validate_nric(form,nric):
+    def validate_nric(form, nric):
         if not nric.data[0].isalpha():
             raise ValidationError("IC must start with S or T")
         if not nric.data[1:7].isdigit():
             raise ValidationError("IC needs to have 7 digits in between 2 letters")
         if not nric.data[-1].isalpha():
             raise ValidationError("IC must end with an alphabet")
-    def validate_contactnumber(form,contactnumber):
+
+    def validate_contactnumber(form, contactnumber):
         if not contactnumber.data.isdigit():
             raise ValidationError("Your number should be in digits")
 
 
-
 class PawnStatus(Form):
-    pawn_status = SelectField('Pawn Status', [validators.DataRequired()],choices=[('Processing', 'Processing'), ('Picked Up', 'Picked Up'), ('Delivered', 'Delivered'),
-                                    ('Inspection', 'Inspection'), ('Offer Accepted', 'Offer Accepted'),
-                                    ('Rejected', 'Rejected'), ('Successful', 'Successful')], default='Processing')
+    pawn_status = SelectField('Pawn Status', [validators.DataRequired()],
+                              choices=[('Processing', 'Processing'), ('Picked Up', 'Picked Up'),
+                                       ('Delivered', 'Delivered'),
+                                       ('Inspection', 'Inspection'), ('Offer Accepted', 'Offer Accepted'),
+                                       ('Rejected', 'Rejected'), ('Successful', 'Successful')], default='Processing')
+
 
 class PawnRetrieval(Form):
     SUI_CODE = StringField('Enter in the SUI:', [validators.Length(min=1, max=9), validators.DataRequired()])
 
+
 class SearchSUI(Form):
-     SUI_CODE = StringField('Enter in the SUI:', [validators.Length(min=1, max=9), validators.DataRequired()])
+    SUI_CODE = StringField('Enter in the SUI:', [validators.Length(min=1, max=9), validators.DataRequired()])
+
 
 class filterStatus(Form):
-    pawn_status = SelectField('Filter by Status:', [validators.DataRequired()],choices=[('','Select'),('Processing', 'Processing'), ('Picked Up', 'Picked Up'), ('Delivered', 'Delivered'),
-                                    ('Inspection', 'Inspection'), ('Offer Accepted', 'Offer Accepted'),
-                                    ('Rejected', 'Rejected'), ('Successful', 'Successful')], default='')
+    pawn_status = SelectField('Filter by Status:', [validators.DataRequired()],
+                              choices=[('', 'Select'), ('Processing', 'Processing'), ('Picked Up', 'Picked Up'),
+                                       ('Delivered', 'Delivered'),
+                                       ('Inspection', 'Inspection'), ('Offer Accepted', 'Offer Accepted'),
+                                       ('Rejected', 'Rejected'), ('Successful', 'Successful')], default='')
 
-#End of Ravu
+# End of Ravu
