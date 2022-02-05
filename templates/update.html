@@ -1,3 +1,8 @@
+{% extends "baseDashboard.html" %}
+{% block title %}Radiant Finance - Manage Customers{% endblock %}
+
+{% block content %}
+<h1 class="display-4">Update</h1>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,7 +18,9 @@
             <option value = "{{trans}}" SELECTED>{{trans}}</option>
             {% endfor %}
         </select>
-            <input type ="name" placeholder="Enter new Name" name="newName" required="required">
+            <input type ="name" placeholder="Enter new Name" name="newName">
+            <input type ="text" placeholder="Enter new Email" name="newEmail1" >
+            <input type ="text" placeholder="Enter new Address" name="newAddress" >
         </div>
         <div class = "display-box">
             {% for obj in objects %}
@@ -36,3 +43,4 @@
         <button style="margin:5px;" name="update" type="submit" value="update">Update Transaction</button>
     </form>
 </html>
+{% endblock %}

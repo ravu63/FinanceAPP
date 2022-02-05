@@ -36,6 +36,11 @@ class Transaction:
     def setName(self, n):
         self.name = n
 
+    def setEmail(self, n):
+        self.email = n
+
+    def setAddress(self, n):
+        self.address = n
 
 # makes use of superclass transaction
 class CustomerPurchase(Transaction):

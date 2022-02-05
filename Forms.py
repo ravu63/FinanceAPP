@@ -176,3 +176,10 @@ class filterStatus(Form):
                                        ('Rejected', 'Rejected'), ('Successful', 'Successful')], default='')
 
 # End of Ravu
+
+class CurrencyRequest(Form):
+    first_name = StringField('First Name', [validators.Length(min=1, max=150), validators.DataRequired()])
+    last_name = StringField('Last Name', [validators.Length(min=1, max=150), validators.DataRequired()])
+    contnumb = StringField('Contact Number', [validators.Length(min=8, max=8), validators.DataRequired()])
+    email = EmailField('Email', [validators.Email(), validators.DataRequired()])
+    requestyourcurrency = TextAreaField('Currency Requested', [validators.Optional()])
