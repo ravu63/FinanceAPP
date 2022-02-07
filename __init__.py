@@ -637,16 +637,16 @@ def customer_stuff():
     if request.method=='POST'and search_customer_form.validate():
         number=[]
         searchCustomer=search_customer_form.searchCustomer.data
-        transactions = shelve.open('transactions')
-        transList = list(transactions.keys())
-        transactions.close()
-        trans = []
-        for id in transList:
-            if transList.getEmail()==searchCustomer:
-                trans.append(transactions[id])
-                number.append('1')
-            else:
-                continue
+        #transactions = shelve.open('transactions')
+        #transList = list(transactions.keys())
+        #transactions.close()
+        #trans = []
+        #for id in transList:
+         #   if transList.getEmail()==searchCustomer:
+          #      trans.append(transactions[id])
+           #     number.append('1')
+            #else:
+             #   continue
 
 
         # transaction_dict={}
