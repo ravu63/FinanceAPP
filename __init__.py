@@ -591,7 +591,7 @@ def delete_feedback(id):
 def no_customer():
     return render_template('noCustomer.html')
 @app.route('/noRecord')
-def no_customer():
+def no_record():
     return render_template('noRecord.html')
 
 
@@ -665,7 +665,7 @@ def customer_stuff():
         if len(number)>0:
             return render_template("customerStuff.html", count=len(number), loan_list=loan_list,pawn_dict=pawn_dict)
         else:
-            return redirect(url_for('no_customer'))
+            return redirect(url_for('no_record'))
     return render_template('searchStuff.html',form=search_customer_form)
 
 
