@@ -32,7 +32,6 @@
           {% endif %}
           <td>{{customer.get_phone()}}</td>
 
-          <td><a href="/updateCustomer/{{customer.get_email()}}" class="btn btn-warning">Update</a></td>
           <td>
             <form action="{{url_for('delete_customer', id=customer.get_email())}}" method="POST">
 

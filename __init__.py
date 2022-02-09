@@ -210,41 +210,6 @@ def manage_admin():
     return render_template('manageAdmin.html', count=len(customers_list), customers_list=customers_list)
 
 
-@app.route('/updateCustomer/<id>/', methods=['GET', 'POST'])
-def customer_user(id):
-    update_customer_form = UpdateCustomerForm(request.form)
-
-    if request.method == 'POST' and update_customer_form.validate():
-        customer_dict = {}
-        db = shelve.open('signup.db', 'w')
-        customer_dict = db['Customers']
-
-        customer = customer_dict.get(id)
-        customer.set_name(update_customer_form.name.data)
-        customer.set_email(update_customer_form.email.data)
-        customer.set_gender(update_customer_form.gender.data)
-        customer.set_birthdate(update_customer_form.birthdate.data)
-        customer.set_phone(update_customer_form.phone.data)
-
-        db['Customers'] = customer_dict
-        db.close()
-
-        return redirect(url_for('manage_customers'))
-    else:
-        users_dict = {}
-        db = shelve.open('signup.db', 'r')
-        customer_dict = db['Customers']
-        db.close()
-
-        customer = customer_dict.get(id)
-        update_customer_form.name.data = customer.get_name()
-        update_customer_form.email.data = customer.get_email()
-        update_customer_form.gender.data = customer.get_gender()
-        update_customer_form.birthdate.data = customer.get_birthdate()
-        update_customer_form.phone.data = customer.get_phone()
-
-        return render_template('updateCustomer.html', form=update_customer_form)
-
 
 @app.route('/updateAdmin/<id>/', methods=['GET', 'POST'])
 def customer_Admin(id):
@@ -625,6 +590,9 @@ def delete_feedback(id):
 @app.route('/noCustomer')
 def no_customer():
     return render_template('noCustomer.html')
+@app.route('/noRecord')
+def no_customer():
+    return render_template('noRecord.html')
 
 
 @app.route('/showCustomer')
