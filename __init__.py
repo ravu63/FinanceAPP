@@ -7,6 +7,8 @@ import random
 import shelve
 import Plan
 from PawnCreation import Pawn_Creation
+import Feedback1
+from Feedback1 import Feedback1
 from PawnStatus import Pawn_Status
 from datetime import date
 from flask import Flask, render_template, request, redirect, url_for, session, flash
@@ -15,7 +17,7 @@ from flask_mail import Mail, Message
 from Forms import CreateCustomerForm, LoginForm, UpdateCustomerForm, UpdateCustomerForm2, ForgetPassword, OTPform, \
     ChangePassword, FeedbackForm, SearchCustomerForm, UpdateStatus, CreateLoanForm, CreatePlanForm, PawnCreation, \
     PawnStatus, \
-    PawnRetrieval, SearchSUI, filterStatus, CurrencyRequest
+    PawnRetrieval, SearchSUI, filterStatus, FeedbackForm1
 from transaction import Transaction, CustomerPurchase
 from currency import Currency
 app = Flask(__name__)
@@ -1118,6 +1120,11 @@ def convert(amt, first, second):
 def moneyExchangePage():
     return render_template('moneyExchanger.html', countries=getCurrencyArray())
 
+@app.route('/moneyConvert', methods=['GET'])
+def moneyConvertPage():
+    return render_template('moneyConvert.html', countries=getCurrencyArray())
+
+
 @app.route('/moneyExchangeUpdate', methods=['GET'])
 def moneyExchangeUpdate():
     transactions = shelve.open('transactions')
@@ -1265,13 +1272,57 @@ def updateTrans():
         return render_template('update.html', check=object, transactions=transList)
 
 @app.route('/CurrencyRequest', methods=['GET', 'POST'])
-def currencyrequest():
-    currency_request = CurrencyRequest(request.form)
-    if request.method == 'POST' and currency_request.validate():
-        return redirect(url_for('CurrencyRequest'))
-    return render_template('request.html', form=currency_request)
+def Feedback2():
+    create_feedback1_form = FeedbackForm1(request.form)
+    if request.method == 'POST' and create_feedback1_form.validate():
+        feedback1_dict = {}
+        db = shelve.open('feedback1.db', 'c')
+
+        try:
+            feedback1_dict = db['Feedback1']
+
+        except:
+            print("Error in retrieving feedback from Feedback1.db.")
+        try:
+            fb = shelve.open('feedback1.db','r')
+            fb_dict = fb['feedback1.db']
+            feedback = Feedback1(
+                create_feedback1_form.name.data,
+                create_feedback1_form.contnumb.data,
+                create_feedback1_form.email.data,
+                create_feedback1_form.requestyourcurrency.data
+            )
+            feedback1_dict[feedback.get_email()] = feedback
+            db['Feedback1'] = feedback1_dict
+            db.close()
+            return redirect(url_for('main'))
+        except:
+            feedback = Feedback1(
+                create_feedback1_form.name.data,
+                create_feedback1_form.contnumb.data,
+                create_feedback1_form.email.data,
+                create_feedback1_form.requestyourcurrency.data
+            )
+            feedback1_dict[feedback.get_name()] = feedback
+            db['Feedback1'] = feedback1_dict
+            db.close()
+            return redirect(url_for('main'))
+    return render_template('request.html', form=create_feedback1_form)
+
+@app.route('/viewFeedback1', methods=['GET', 'POST'])
+def view_feedback1():
+    feedback1_dict = {}
+    db = shelve.open('feedback1.db', 'r')
+    feedback1_dict = db['Feedback1']
+    db.close()
+
+    feedback1_list = []
+    for key in feedback1_dict:
+      feedback = feedback1_dict.get(key)
+      feedback1_list.append(feedback)
+    return render_template('requested.html', count=len(feedback1_list), feedback1_list=feedback1_list)
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
     FLASK_DEBUG = True

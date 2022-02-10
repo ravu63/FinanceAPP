@@ -15,18 +15,21 @@
         <div class="select-box">
             <select name="tId">
             {% for trans in transactions %}
+
             <option value = "{{trans}}" SELECTED>{{trans}}</option>
             {% endfor %}
         </select>
-            <input type ="name" placeholder="Enter new Name" name="newName">
+            <input type ="name" placeholder="Enter new Name" name="newName" >
             <input type ="text" placeholder="Enter new Email" name="newEmail1" >
             <input type ="text" placeholder="Enter new Address" name="newAddress" >
         </div>
-        <div class = "display-box">
-            {% for obj in objects %}
-            <p>{{obj}}</p>
-        </div>
+<!--       <div class = "display-box">-->
+<!--            {% for obj in objects %}-->
+<!--            <p>{{obj}}</p>-->
+<!--        </div>-->
         {% endfor %}
+        <br>
+        <br>
         {% if details %}
         <div class ="detail-box">
             <p>Transaction ID {{id}} successfully updated.</p>
@@ -43,4 +46,35 @@
         <button style="margin:5px;" name="update" type="submit" value="update">Update Transaction</button>
     </form>
 </html>
+<div>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Address</th>
+        <th>City</th>
+        <th>State</th>
+          <th>Zip</th>
+          <th>Transaction ID</th>
+        <th></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for obj in objects %}
+        <tr>
+
+          <td>{{ obj.getName() }}</td>
+          <td>{{ obj.getEmail() }}</td>
+          <td>{{obj.getAddress()}}</td>
+          <td>{{obj.getCity()}}</td>
+            <td>{{obj.getState()}}</td>
+            <td>{{obj.getZip()}}</td>
+            <td>{{obj.getTransactionID()}}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% endblock %}
